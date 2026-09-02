@@ -254,6 +254,39 @@
       margin-top: 44px;
       align-items: start;
     }
+    .map-next {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .next-link {
+      min-height: 150px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.48);
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .next-link:hover, .next-link:focus-visible {
+      transform: translateY(-3px);
+      border-color: rgba(29,41,40,.38);
+      background: rgba(255,255,255,.78);
+      outline: none;
+    }
+    .next-link small {
+      color: var(--coral);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .68rem;
+      font-weight: 760;
+    }
+    .next-link strong { font-size: 1.15rem; letter-spacing: -.02em; }
+    .next-link span { color: var(--muted); font-size: .88rem; }
     .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .map-node {
       text-align: left;
@@ -356,8 +389,8 @@
     }
     .curtain h2 { max-width: 760px; }
     .curtain p { max-width: 700px; color: rgba(244,239,229,.68); }
-    .private-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 36px; max-width: 920px; }
-    .private-labels span {
+    .direction-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 36px; max-width: 920px; }
+    .direction-labels span {
       padding: 10px 14px;
       border: 1px solid rgba(244,239,229,.22);
       border-radius: 999px;
@@ -411,6 +444,7 @@
       section { padding: 68px 0; }
       .map-grid, .slice-grid { grid-template-columns: 1fr; }
       .map-node:first-child { grid-column: auto; }
+      .map-next { grid-template-columns: 1fr; }
       .footer-inner { display: block; }
     }
 
@@ -437,8 +471,7 @@
         <h1>zaizai<em>:</em><br>Pet Agent</h1>
         <p class="hero-copy" data-en="A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side." data-zh="一只生活在 Apple Watch 上的小狗。它感知你的生活节奏，逐渐学会什么时候靠近，什么时候安静地待在身边。">A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side.</p>
         <div class="hero-actions">
-          <a class="cta primary" href="#map" data-en="Explore the product map ↓" data-zh="查看产品地图 ↓">Explore the product map ↓</a>
-          <a class="cta secondary" href="#progress" data-en="See current progress" data-zh="查看当前进展">See current progress</a>
+          <a class="cta primary" href="#thesis" data-en="Explore the concept ↓" data-zh="从头探索 ↓">Explore the concept ↓</a>
         </div>
       </div>
       <div class="watch-stage" aria-label="Abstract Apple Watch companion illustration">
@@ -476,18 +509,6 @@
       </div>
     </section>
 
-    <section id="map">
-      <div class="shell">
-        <span class="section-kicker" data-en="Interactive system map" data-zh="交互式系统地图">Interactive system map</span>
-        <h2 data-en="Five modules, one coherent companion." data-zh="五个模块，共同构成一段连贯的陪伴。">Five modules, one coherent companion.</h2>
-        <p class="section-intro" data-en="Select a module to see its role and its public-facing connections. This map intentionally shows the architecture — not the private behavioral rules behind it." data-zh="点击模块查看它的作用和公开层面的连接关系。这张地图有意展示系统结构，而不公开背后的具体行为规则。">Select a module to see its role and its public-facing connections. This map intentionally shows the architecture — not the private behavioral rules behind it.</p>
-        <div class="map-layout">
-          <div class="map-grid" id="mapGrid"></div>
-          <aside class="detail-panel" id="detailPanel" aria-live="polite"></aside>
-        </div>
-      </div>
-    </section>
-
     <section id="flow-section">
       <div class="shell">
         <span class="section-kicker" data-en="Behavior loop" data-zh="行为循环">Behavior loop</span>
@@ -516,16 +537,40 @@
       </div>
     </section>
 
+    <section id="map">
+      <div class="shell">
+        <span class="section-kicker" data-en="Interactive product map" data-zh="交互式产品地图">Interactive product map</span>
+        <h2 data-en="Five modules, one coherent companion." data-zh="五个模块，共同构成一段连贯的陪伴。">Five modules, one coherent companion.</h2>
+        <p class="section-intro" data-en="Select a module to see its role and connections. The map brings the principles, moments and behavior above into one coherent product view." data-zh="点击模块查看它的作用与连接关系。这张地图把前面的产品原则、体验时刻和行为逻辑收拢成一套完整视图。">Select a module to see its role and connections. The map brings the principles, moments and behavior above into one coherent product view.</p>
+        <div class="map-layout">
+          <div class="map-grid" id="mapGrid"></div>
+          <aside class="detail-panel" id="detailPanel" aria-live="polite"></aside>
+        </div>
+        <nav class="map-next" aria-label="Continue exploring">
+          <a class="next-link" href="#beyond">
+            <small data-en="The system keeps growing" data-zh="系统仍在生长">The system keeps growing</small>
+            <strong data-en="Beyond the product map →" data-zh="产品地图之外 →">Beyond the product map →</strong>
+            <span data-en="Character, story, relationship, emotion and longer-term directions." data-zh="角色、故事、关系、情绪与更长期的产品方向。">Character, story, relationship, emotion and longer-term directions.</span>
+          </a>
+          <a class="next-link" href="#progress">
+            <small data-en="From concept to prototype" data-zh="从概念到原型">From concept to prototype</small>
+            <strong data-en="See current progress →" data-zh="查看当前进展 →">See current progress →</strong>
+            <span data-en="What is already mapped, and what comes next." data-zh="目前已经完成什么，以及下一步准备做什么。">What is already mapped, and what comes next.</span>
+          </a>
+        </nav>
+      </div>
+    </section>
+
     <section id="beyond">
       <div class="shell">
         <div class="curtain">
-          <span class="section-kicker" data-en="Beyond the public map" data-zh="公开地图之外">Beyond the public map</span>
-          <h2 data-en="The architecture is public. The behavioral recipe is not." data-zh="公开的是架构，不公开的是完整行为配方。">The architecture is public. The behavioral recipe is not.</h2>
-          <p data-en="The working project goes deeper than this selected view. The following areas are actively considered, while their rules, thresholds, content and future roadmap remain private during Alpha development." data-zh="真实项目比这份公开页面更深入。以下部分均已进入思考与设计，但其具体规则、阈值、内容和未来路线在 Alpha 开发期间保持私有。">The working project goes deeper than this selected view. The following areas are actively considered, while their rules, thresholds, content and future roadmap remain private during Alpha development.</p>
-          <div class="private-labels" aria-label="Private design areas">
+          <span class="section-kicker" data-en="Beyond the product map" data-zh="产品地图之外">Beyond the product map</span>
+          <h2 data-en="A deeper companion system is taking shape." data-zh="一套更深的陪伴系统，正在逐渐成形。">A deeper companion system is taking shape.</h2>
+          <p data-en="The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha." data-zh="这个概念还在延展到角色一致性、持续生长的故事、关系发展、情绪节奏与更长期的产品可能性。它们共同影响 zaizai 如何从第一个 Alpha 继续成长。">The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha.</p>
+          <div class="direction-labels" aria-label="Further design areas">
             <span>Character Bible</span><span>Story System</span><span>Relationship Model</span><span>Emotion Transitions</span><span>Pacing &amp; Conditions</span><span>Memory Design</span><span>Evaluation Cases</span><span>Long-term Product Paths</span>
           </div>
-          <div class="interview-note" data-en="Selected decisions and prototypes are available to discuss in an interview." data-zh="部分关键决策与原型可在面试中进一步交流。">Selected decisions and prototypes are available to discuss in an interview.</div>
+          <div class="interview-note" data-en="Selected design decisions are best unpacked through conversation." data-zh="其中的关键设计取舍，更适合在交流中展开。">Selected design decisions are best unpacked through conversation.</div>
         </div>
       </div>
     </section>
