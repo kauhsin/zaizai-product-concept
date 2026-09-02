@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4efe5">
+  <title>zaizai: Pet Agent — Interactive Product Concept</title>
+  <meta name="description" content="An interactive product concept for an Apple Watch companion agent that knows when to come closer — and when to stay quiet.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kauhsin.github.io/zaizai-product-concept/">
+  <meta property="og:title" content="zaizai: Pet Agent — Interactive Product Concept">
+  <meta property="og:description" content="A selected public view of an Apple Watch companion agent in development.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="zaizai: Pet Agent — Interactive Product Concept">
+  <meta name="twitter:description" content="A selected public view of an Apple Watch companion agent in development.">
+  <style>
+    :root {
+      --paper: #f4efe5;
+      --paper-deep: #e9e1d3;
+      --ink: #1d2928;
+      --muted: #65716e;
+      --line: rgba(29, 41, 40, .16);
+      --coral: #ef6c4d;
+      --coral-soft: #ffd6ca;
+      --leaf: #b7d84b;
+      --leaf-soft: #e6f1b8;
+      --blue: #7eb8ca;
+      --white: rgba(255, 255, 255, .62);
+      --shadow: 0 24px 70px rgba(38, 46, 43, .10);
+      --radius: 26px;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 2%, rgba(239, 108, 77, .13), transparent 28rem),
+        radial-gradient(circle at 94% 24%, rgba(183, 216, 75, .17), transparent 25rem),
+        var(--paper);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, a { font: inherit; }
+    a { color: inherit; }
+    button { color: inherit; }
+    .shell { width: min(var(--max), calc(100% - 40px)); margin: 0 auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(18px);
+      background: rgba(244, 239, 229, .82);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .wordmark { font-weight: 760; letter-spacing: -.035em; font-size: 1.07rem; }
+    .wordmark span { color: var(--coral); }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .status-pill, .lang-switch {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.5);
+      padding: 8px 12px;
+      font-size: .77rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .status-pill::before {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: var(--leaf);
+      box-shadow: 0 0 0 4px rgba(183,216,75,.2);
+    }
+    .lang-switch { cursor: pointer; min-width: 62px; }
+    .lang-switch:hover, .lang-switch:focus-visible { background: #fff; outline: none; }
+
+    .hero {
+      min-height: 680px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+      align-items: center;
+      gap: 72px;
+      padding: 88px 0 78px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .77rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      font-weight: 720;
+      color: var(--muted);
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--coral); }
+    h1 {
+      margin: 22px 0 18px;
+      max-width: 800px;
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-size: clamp(4rem, 9vw, 8.2rem);
+      line-height: .86;
+      letter-spacing: -.075em;
+      font-weight: 600;
+    }
+    h1 em { color: var(--coral); font-style: italic; }
+    .hero-copy {
+      max-width: 690px;
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+      color: #475350;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid var(--ink);
+      text-decoration: none;
+      font-weight: 680;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .cta.primary { background: var(--ink); color: var(--paper); }
+    .cta.secondary { background: rgba(255,255,255,.5); }
+    .cta:hover, .cta:focus-visible { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(29,41,40,.14); outline: none; }
+
+    .watch-stage { position: relative; min-height: 470px; display: grid; place-items: center; }
+    .orbit {
+      position: absolute;
+      width: 440px;
+      height: 440px;
+      max-width: 95%;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      animation: drift 12s ease-in-out infinite;
+    }
+    .orbit::before, .orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+    }
+    .orbit::before { width: 30px; height: 30px; background: var(--leaf); top: 30px; right: 54px; }
+    .orbit::after { width: 18px; height: 18px; background: var(--coral); bottom: 54px; left: 38px; }
+    .watch {
+      position: relative;
+      width: 232px;
+      height: 278px;
+      border-radius: 72px;
+      background: #202a29;
+      border: 10px solid #35413e;
+      box-shadow: 0 30px 60px rgba(27, 36, 34, .25), inset 0 0 0 1px rgba(255,255,255,.12);
+      transform: rotate(4deg);
+      display: grid;
+      place-items: center;
+    }
+    .watch::before {
+      content: "";
+      position: absolute;
+      right: -20px;
+      top: 72px;
+      width: 10px;
+      height: 42px;
+      border-radius: 8px;
+      background: #35413e;
+    }
+    .screen {
+      width: calc(100% - 22px);
+      height: calc(100% - 22px);
+      border-radius: 58px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(183,216,75,.18), transparent 44%),
+        #101817;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .presence {
+      position: relative;
+      width: 102px;
+      height: 102px;
+      border-radius: 44% 44% 48% 48%;
+      background: var(--coral-soft);
+      box-shadow: inset 0 -12px 0 rgba(239,108,77,.10);
+    }
+    .presence::before, .presence::after {
+      content: "";
+      position: absolute;
+      top: -17px;
+      width: 42px;
+      height: 54px;
+      border-radius: 80% 20% 65% 35%;
+      background: #efbda8;
+      z-index: -1;
+    }
+    .presence::before { left: -10px; transform: rotate(-25deg); }
+    .presence::after { right: -10px; transform: scaleX(-1) rotate(-25deg); }
+    .eye { position: absolute; top: 42px; width: 9px; height: 11px; border-radius: 50%; background: var(--ink); }
+    .eye.left { left: 28px; }
+    .eye.right { right: 28px; }
+    .nose { position: absolute; width: 15px; height: 11px; border-radius: 50% 50% 55% 55%; background: var(--ink); left: 50%; top: 59px; transform: translateX(-50%); }
+    .screen-note { position: absolute; bottom: 34px; color: rgba(255,255,255,.7); font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; }
+
+    section { padding: 90px 0; border-top: 1px solid var(--line); }
+    .section-kicker { color: var(--coral); text-transform: uppercase; letter-spacing: .14em; font-size: .74rem; font-weight: 760; }
+    h2 {
+      margin: 10px 0 16px;
+      max-width: 850px;
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-size: clamp(2.4rem, 5vw, 4.6rem);
+      line-height: .98;
+      letter-spacing: -.05em;
+      font-weight: 580;
+    }
+    .section-intro { max-width: 720px; color: var(--muted); font-size: 1.06rem; }
+
+    .thesis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 44px; }
+    .thesis-card {
+      min-height: 230px;
+      padding: 26px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .thesis-card:nth-child(2) { background: var(--coral-soft); }
+    .thesis-card:nth-child(3) { background: var(--leaf-soft); }
+    .card-number { font-size: .75rem; color: var(--muted); letter-spacing: .12em; }
+    .thesis-card h3 { margin: 25px 0 8px; font-size: 1.3rem; letter-spacing: -.025em; }
+    .thesis-card p { margin: 0; color: #4f5a57; }
+
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(300px, .82fr);
+      gap: 22px;
+      margin-top: 44px;
+      align-items: start;
+    }
+    .map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .map-node {
+      text-align: left;
+      min-height: 150px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255,255,255,.5);
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .map-node:first-child { grid-column: span 2; }
+    .map-node:hover, .map-node:focus-visible { transform: translateY(-3px); border-color: rgba(29,41,40,.38); outline: none; }
+    .map-node.active { background: var(--ink); color: var(--paper); }
+    .node-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .node-index { font-size: .72rem; color: var(--coral); letter-spacing: .11em; }
+    .map-node.active .node-index { color: var(--leaf); }
+    .map-node h3 { margin: 30px 0 5px; font-size: 1.2rem; letter-spacing: -.025em; }
+    .map-node p { margin: 0; font-size: .9rem; color: var(--muted); }
+    .map-node.active p { color: rgba(244,239,229,.7); }
+    .arrow { font-size: 1.15rem; }
+
+    .detail-panel {
+      position: sticky;
+      top: 92px;
+      min-height: 478px;
+      padding: 30px;
+      border-radius: var(--radius);
+      background: #fffaf1;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .detail-tag { display: inline-block; color: var(--coral); text-transform: uppercase; font-size: .7rem; letter-spacing: .13em; font-weight: 750; }
+    .detail-panel h3 { margin: 14px 0 10px; font-size: 1.8rem; letter-spacing: -.035em; }
+    .detail-panel > p { color: var(--muted); }
+    .detail-list { margin: 24px 0 0; padding: 0; list-style: none; }
+    .detail-list li { padding: 12px 0; border-top: 1px solid var(--line); }
+    .relation-label { margin-top: 27px; font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+    .chip { border-radius: 999px; padding: 7px 10px; font-size: .78rem; background: var(--paper-deep); }
+
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 44px; }
+    .flow-step {
+      position: relative;
+      min-height: 154px;
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.5);
+      border: 1px solid var(--line);
+    }
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -17px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--paper);
+      color: var(--coral);
+      font-weight: 800;
+    }
+    .flow-step strong { display: block; margin-bottom: 18px; font-size: .75rem; color: var(--coral); }
+    .flow-step h3 { margin: 0 0 7px; font-size: 1rem; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: .86rem; }
+
+    .slice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 44px; }
+    .slice {
+      min-height: 255px;
+      padding: 26px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.52);
+    }
+    .slice-status { display: inline-block; padding: 5px 9px; border-radius: 999px; background: var(--leaf-soft); font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; }
+    .slice h3 { font-size: 1.55rem; letter-spacing: -.035em; margin: 35px 0 10px; }
+    .slice p { color: var(--muted); margin: 0; }
+
+    .curtain {
+      position: relative;
+      overflow: hidden;
+      border-radius: 34px;
+      background: var(--ink);
+      color: var(--paper);
+      padding: clamp(30px, 6vw, 68px);
+    }
+    .curtain::after {
+      content: "";
+      position: absolute;
+      width: 360px;
+      height: 360px;
+      right: -130px;
+      bottom: -180px;
+      border-radius: 50%;
+      border: 70px solid rgba(183,216,75,.13);
+    }
+    .curtain h2 { max-width: 760px; }
+    .curtain p { max-width: 700px; color: rgba(244,239,229,.68); }
+    .private-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 36px; max-width: 920px; }
+    .private-labels span {
+      padding: 10px 14px;
+      border: 1px solid rgba(244,239,229,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      color: rgba(244,239,229,.9);
+      font-size: .87rem;
+    }
+    .interview-note { display: inline-flex; gap: 10px; align-items: center; color: var(--leaf); font-weight: 720; }
+    .interview-note::before { content: "↳"; font-size: 1.25rem; }
+
+    .progress-wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 55px; margin-top: 44px; }
+    .meta-card { padding: 28px; border-radius: var(--radius); background: var(--coral-soft); }
+    .meta-row { padding: 14px 0; border-top: 1px solid rgba(29,41,40,.14); }
+    .meta-row:first-child { border-top: 0; padding-top: 0; }
+    .meta-row small { display: block; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; font-size: .68rem; margin-bottom: 5px; }
+    .timeline { list-style: none; padding: 0; margin: 0; }
+    .timeline li { display: grid; grid-template-columns: 22px 1fr; gap: 18px; padding: 0 0 30px; }
+    .timeline li::before { content: ""; width: 13px; height: 13px; margin-top: 5px; border-radius: 50%; background: var(--paper); border: 2px solid var(--muted); box-shadow: 0 0 0 6px var(--paper); }
+    .timeline li.done::before { background: var(--leaf); border-color: var(--ink); }
+    .timeline li.now::before { background: var(--coral); border-color: var(--ink); }
+    .timeline h3 { margin: 0 0 5px; font-size: 1rem; }
+    .timeline p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+    footer { padding: 40px 0 55px; border-top: 1px solid var(--line); color: var(--muted); }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+    .footer-inner strong { color: var(--ink); }
+
+    @keyframes drift {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      50% { transform: translateY(-12px) rotate(3deg); }
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 68px; }
+      .watch-stage { min-height: 370px; }
+      .watch { width: 190px; height: 226px; border-radius: 58px; }
+      .screen { border-radius: 46px; }
+      .orbit { width: 340px; height: 340px; }
+      .thesis-grid, .flow { grid-template-columns: 1fr; }
+      .flow-step:not(:last-child)::after { content: "↓"; top: auto; right: 50%; bottom: -18px; transform: translateX(50%); }
+      .map-layout, .progress-wrap { grid-template-columns: 1fr; }
+      .detail-panel { position: static; min-height: 0; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 24px, var(--max)); }
+      .topbar-inner { min-height: 62px; }
+      .status-pill { display: none; }
+      .hero { min-height: auto; padding-bottom: 60px; }
+      h1 { font-size: clamp(3.6rem, 20vw, 5rem); }
+      section { padding: 68px 0; }
+      .map-grid, .slice-grid { grid-template-columns: 1fr; }
+      .map-node:first-child { grid-column: auto; }
+      .footer-inner { display: block; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div class="wordmark">zaizai<span>:</span> Pet Agent</div>
+      <div class="top-actions">
+        <span class="status-pill" data-en="Work in progress" data-zh="进行中">Work in progress</span>
+        <button class="lang-switch" id="langSwitch" type="button" aria-label="切换中文" aria-pressed="false">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="shell hero">
+      <div>
+        <span class="eyebrow" data-en="Independent product & agent design" data-zh="独立产品与 Agent 设计">Independent product &amp; agent design</span>
+        <h1>zaizai<em>:</em><br>Pet Agent</h1>
+        <p class="hero-copy" data-en="A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side." data-zh="一只生活在 Apple Watch 上的小狗。它感知你的生活节奏，逐渐学会什么时候靠近，什么时候安静地待在身边。">A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side.</p>
+        <div class="hero-actions">
+          <a class="cta primary" href="#map" data-en="Explore the product map ↓" data-zh="查看产品地图 ↓">Explore the product map ↓</a>
+          <a class="cta secondary" href="#progress" data-en="See current progress" data-zh="查看当前进展">See current progress</a>
+        </div>
+      </div>
+      <div class="watch-stage" aria-label="Abstract Apple Watch companion illustration">
+        <div class="orbit" aria-hidden="true"></div>
+        <div class="watch" aria-hidden="true">
+          <div class="screen">
+            <div class="presence">
+              <i class="eye left"></i><i class="eye right"></i><i class="nose"></i>
+            </div>
+            <span class="screen-note">a quiet presence</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="thesis">
+      <div class="shell">
+        <span class="section-kicker" data-en="Product thesis" data-zh="产品命题">Product thesis</span>
+        <h2 data-en="Not another pet to maintain. Not another agent waiting for commands." data-zh="不是另一只需要供养的宠物，也不是另一个等待命令的 Agent。">Not another pet to maintain. Not another agent waiting for commands.</h2>
+        <p class="section-intro" data-en="zaizai explores a third kind of relationship: a companion with its own presence, shaped by real-life context and respectful initiative — without turning care into obligation." data-zh="zaizai 探索的是第三种关系：它有自己的存在感，会结合现实情境主动靠近，同时不把照料变成用户的义务。">zaizai explores a third kind of relationship: a companion with its own presence, shaped by real-life context and respectful initiative — without turning care into obligation.</p>
+        <div class="thesis-grid">
+          <article class="thesis-card">
+            <span class="card-number">01 / PET FIRST</span>
+            <div><h3 data-en="A character, not a chatbot" data-zh="先是角色，不是聊天框">A character, not a chatbot</h3><p data-en="Personality is felt through gaze, movement, timing and restraint — not long conversations." data-zh="性格通过眼神、动作、节奏和克制被感受到，而不是靠长篇对话。">Personality is felt through gaze, movement, timing and restraint — not long conversations.</p></div>
+          </article>
+          <article class="thesis-card">
+            <span class="card-number">02 / LOW BURDEN</span>
+            <div><h3 data-en="Care without guilt" data-zh="没有愧疚感的照料">Care without guilt</h3><p data-en="Ignoring an interaction is always valid. zaizai never turns absence into punishment." data-zh="不回应永远是合法选择；zaizai 不会把用户的缺席变成惩罚。">Ignoring an interaction is always valid. zaizai never turns absence into punishment.</p></div>
+          </article>
+          <article class="thesis-card">
+            <span class="card-number">03 / TIMING</span>
+            <div><h3 data-en="Intelligence as discretion" data-zh="智能首先是一种分寸">Intelligence as discretion</h3><p data-en="The most important decision may be whether to appear at all." data-zh="最重要的决定，有时是此刻究竟要不要出现。">The most important decision may be whether to appear at all.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="map">
+      <div class="shell">
+        <span class="section-kicker" data-en="Interactive system map" data-zh="交互式系统地图">Interactive system map</span>
+        <h2 data-en="Five modules, one coherent companion." data-zh="五个模块，共同构成一段连贯的陪伴。">Five modules, one coherent companion.</h2>
+        <p class="section-intro" data-en="Select a module to see its role and its public-facing connections. This map intentionally shows the architecture — not the private behavioral rules behind it." data-zh="点击模块查看它的作用和公开层面的连接关系。这张地图有意展示系统结构，而不公开背后的具体行为规则。">Select a module to see its role and its public-facing connections. This map intentionally shows the architecture — not the private behavioral rules behind it.</p>
+        <div class="map-layout">
+          <div class="map-grid" id="mapGrid"></div>
+          <aside class="detail-panel" id="detailPanel" aria-live="polite"></aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="flow-section">
+      <div class="shell">
+        <span class="section-kicker" data-en="Behavior loop" data-zh="行为循环">Behavior loop</span>
+        <h2 data-en="From life context to a small, meaningful moment." data-zh="从生活情境，到一个恰到好处的小瞬间。">From life context to a small, meaningful moment.</h2>
+        <div class="flow">
+          <article class="flow-step"><strong>01</strong><h3 data-en="Life context" data-zh="生活情境">Life context</h3><p data-en="Relevant signals and explicit boundaries." data-zh="相关信号与用户明确设置的边界。">Relevant signals and explicit boundaries.</p></article>
+          <article class="flow-step"><strong>02</strong><h3 data-en="Candidate moment" data-zh="候选时刻">Candidate moment</h3><p data-en="A small reason for zaizai to approach." data-zh="一个让 zaizai 想靠近的小小理由。">A small reason for zaizai to approach.</p></article>
+          <article class="flow-step"><strong>03</strong><h3 data-en="Intervention decision" data-zh="介入判断">Intervention decision</h3><p data-en="Appear, soften, delay, or stay quiet." data-zh="出现、降低强度、延后，或保持安静。">Appear, soften, delay, or stay quiet.</p></article>
+          <article class="flow-step"><strong>04</strong><h3 data-en="Pet expression" data-zh="宠物表达">Pet expression</h3><p data-en="Motion, gaze, haptics and one small action." data-zh="动作、眼神、触觉和一个小互动。">Motion, gaze, haptics and one small action.</p></article>
+          <article class="flow-step"><strong>05</strong><h3 data-en="Continuity" data-zh="关系连续性">Continuity</h3><p data-en="The response becomes part of what comes next." data-zh="这次回应，成为下一次关系的一部分。">The response becomes part of what comes next.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="slices">
+      <div class="shell">
+        <span class="section-kicker" data-en="Playable slices" data-zh="可玩体验切片">Playable slices</span>
+        <h2 data-en="Small scenes that make the system tangible." data-zh="用小场景，让系统能力变得可感知。">Small scenes that make the system tangible.</h2>
+        <p class="section-intro" data-en="The Alpha will select at least two slices for end-to-end prototyping. These are exploration candidates, not shipped claims." data-zh="Alpha 将从候选池中选择至少两个场景做端到端原型。以下是探索方向，不代表已经上线。">The Alpha will select at least two slices for end-to-end prototyping. These are exploration candidates, not shipped claims.</p>
+        <div class="slice-grid">
+          <article class="slice"><span class="slice-status" data-en="Foundation" data-zh="基础体验">Foundation</span><h3 data-en="First hello" data-zh="第一次见面">First hello</h3><p data-en="A short introduction that establishes presence, consent and the beginning of a relationship." data-zh="一段很短的初见，建立角色存在感、权限边界和关系的起点。">A short introduction that establishes presence, consent and the beginning of a relationship.</p></article>
+          <article class="slice"><span class="slice-status" data-en="Exploration" data-zh="探索中">Exploration</span><h3 data-en="A small walking discovery" data-zh="散步中的小发现">A small walking discovery</h3><p data-en="A real-world walk becomes a tiny shared experience rather than another fitness metric." data-zh="让一次现实散步变成共同经历，而不是另一项运动指标。">A real-world walk becomes a tiny shared experience rather than another fitness metric.</p></article>
+          <article class="slice"><span class="slice-status" data-en="Core validation" data-zh="核心验证">Core validation</span><h3 data-en="The right moment to come closer" data-zh="在合适的时候靠近">The right moment to come closer</h3><p data-en="The same impulse can become a gentle invitation, a delayed moment, or intentional silence." data-zh="同一个靠近的念头，可以变成轻轻邀请、稍后再来，或有意识的沉默。">The same impulse can become a gentle invitation, a delayed moment, or intentional silence.</p></article>
+          <article class="slice"><span class="slice-status" data-en="Character study" data-zh="角色探索">Character study</span><h3 data-en="A tiny mood, easily repaired" data-zh="一点小情绪，很快就和好">A tiny mood, easily repaired</h3><p data-en="zaizai can have feelings and preferences without making the user responsible for emotional maintenance." data-zh="zaizai 可以有情绪和偏好，但不会把情绪照料变成用户的责任。">zaizai can have feelings and preferences without making the user responsible for emotional maintenance.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="beyond">
+      <div class="shell">
+        <div class="curtain">
+          <span class="section-kicker" data-en="Beyond the public map" data-zh="公开地图之外">Beyond the public map</span>
+          <h2 data-en="The architecture is public. The behavioral recipe is not." data-zh="公开的是架构，不公开的是完整行为配方。">The architecture is public. The behavioral recipe is not.</h2>
+          <p data-en="The working project goes deeper than this selected view. The following areas are actively considered, while their rules, thresholds, content and future roadmap remain private during Alpha development." data-zh="真实项目比这份公开页面更深入。以下部分均已进入思考与设计，但其具体规则、阈值、内容和未来路线在 Alpha 开发期间保持私有。">The working project goes deeper than this selected view. The following areas are actively considered, while their rules, thresholds, content and future roadmap remain private during Alpha development.</p>
+          <div class="private-labels" aria-label="Private design areas">
+            <span>Character Bible</span><span>Story System</span><span>Relationship Model</span><span>Emotion Transitions</span><span>Pacing &amp; Conditions</span><span>Memory Design</span><span>Evaluation Cases</span><span>Long-term Product Paths</span>
+          </div>
+          <div class="interview-note" data-en="Selected decisions and prototypes are available to discuss in an interview." data-zh="部分关键决策与原型可在面试中进一步交流。">Selected decisions and prototypes are available to discuss in an interview.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="progress">
+      <div class="shell">
+        <span class="section-kicker" data-en="Current status" data-zh="当前进展">Current status</span>
+        <h2 data-en="The thinking is mapped. The first playable proof comes next." data-zh="产品思路已经成形，下一步是第一个可玩的证明。">The thinking is mapped. The first playable proof comes next.</h2>
+        <div class="progress-wrap">
+          <aside class="meta-card">
+            <div class="meta-row"><small data-en="Stage" data-zh="阶段">Stage</small><strong>Pre-Alpha / WIP</strong></div>
+            <div class="meta-row"><small data-en="Platform" data-zh="平台">Platform</small><strong>Apple Watch + iPhone</strong></div>
+            <div class="meta-row"><small data-en="Role" data-zh="职责">Role</small><strong data-en="Product strategy · Interaction · Agent design · Development" data-zh="产品策略 · 交互 · Agent 设计 · 开发">Product strategy · Interaction · Agent design · Development</strong></div>
+            <div class="meta-row"><small data-en="Approach" data-zh="方法">Approach</small><strong data-en="Build a little, wear it, learn, repeat." data-zh="做一点，戴起来体验，再回来调整。">Build a little, wear it, learn, repeat.</strong></div>
+          </aside>
+          <ol class="timeline">
+            <li class="done"><div><h3 data-en="Product thesis & boundaries" data-zh="产品命题与边界">Product thesis &amp; boundaries</h3><p data-en="Defined the relationship, interaction principles and what the product refuses to become." data-zh="明确关系、交互原则，以及产品拒绝变成什么。">Defined the relationship, interaction principles and what the product refuses to become.</p></div></li>
+            <li class="done"><div><h3 data-en="System map & Alpha scope" data-zh="系统地图与 Alpha 范围">System map &amp; Alpha scope</h3><p data-en="Mapped the core capabilities, dependencies and a small candidate slice pool." data-zh="梳理核心能力、依赖关系和首批切片候选池。">Mapped the core capabilities, dependencies and a small candidate slice pool.</p></div></li>
+            <li class="now"><div><h3 data-en="First playable prototype" data-zh="首个可玩原型">First playable prototype</h3><p data-en="Next: turn one scene into an end-to-end Watch experience with lightweight assets and realistic mock data." data-zh="下一步：用轻量素材与贴近真实的数据，把一个场景做成 Watch 端到端体验。">Next: turn one scene into an end-to-end Watch experience with lightweight assets and realistic mock data.</p></div></li>
+            <li><div><h3 data-en="Personal device validation" data-zh="个人真机验证">Personal device validation</h3><p data-en="Wear, observe and refine timing, clarity and emotional feel on a real Apple Watch." data-zh="在真实 Apple Watch 上佩戴、观察并调整时机、清晰度和情绪感受。">Wear, observe and refine timing, clarity and emotional feel on a real Apple Watch.</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <strong>zaizai: Pet Agent</strong>
+      <span data-en="Independent product concept · Selected public view · 2026" data-zh="独立产品概念 · 精选公开版本 · 2026">Independent product concept · Selected public view · 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    const modules = [
+      {
+        id: "compass",
+        index: "01",
+        title: { en: "Product compass", zh: "产品罗盘" },
+        short: { en: "The relationship and boundaries that guide every decision.", zh: "指导所有产品决策的关系定位与边界。" },
+        summary: { en: "zaizai is a pet first and an agent second: warm, low-burden, nonverbal by default, and designed around discretion.", zh: "zaizai 首先是一只宠物，其次才是 Agent：亲切、低负担、默认非语言，并把分寸感放在核心。" },
+        points: {
+          en: ["Pet-like presence before utility", "Care without guilt or punishment", "Wellness as a side effect of companionship"],
+          zh: ["先有宠物般的存在，再谈功能", "照料不以愧疚或惩罚驱动", "Wellness 是陪伴自然产生的副产品"]
+        },
+        depends: { en: ["Product thesis"], zh: ["产品命题"] },
+        enables: { en: ["Experience slices", "Agent behavior", "Validation"], zh: ["体验切片", "Agent 行为", "验证标准"] }
+      },
+      {
+        id: "experiences",
+        index: "02",
+        title: { en: "Playable experiences", zh: "可玩体验" },
+        short: { en: "Small scenes where the product becomes emotionally legible.", zh: "让产品在小场景里变得可感、可玩。" },
+        summary: { en: "The Alpha is organized around a small pool of vertical slices, each combining context, behavior, expression and user choice.", zh: "Alpha 围绕少量纵向切片推进，每个切片都组合情境、行为、表达与用户选择。" },
+        points: {
+          en: ["First hello", "A small walking discovery", "A respectful proactive moment", "A tiny emotional repair"],
+          zh: ["第一次见面", "散步中的小发现", "有分寸的主动靠近", "一次轻轻的情绪修复"]
+        },
+        depends: { en: ["Product compass", "Agent behavior"], zh: ["产品罗盘", "Agent 行为"] },
+        enables: { en: ["Wearable prototype", "Portfolio evidence"], zh: ["可穿戴原型", "Portfolio 证据"] }
+      },
+      {
+        id: "agent",
+        index: "03",
+        title: { en: "Agent behavior", zh: "Agent 行为" },
+        short: { en: "Context, initiative and the ability to remain quiet.", zh: "理解情境、主动靠近，也有能力保持安静。" },
+        summary: { en: "The central intelligence is not unlimited conversation. It is choosing whether, when and how strongly to enter the user's attention.", zh: "核心智能不是无限对话，而是决定是否、何时、以多强的方式进入用户的注意力。" },
+        points: {
+          en: ["Context-aware intervention", "Conservative behavior under uncertainty", "Relationship-aware expression", "Clear user boundaries"],
+          zh: ["理解情境的介入判断", "不确定时保持保守", "结合关系的表达", "明确服从用户边界"]
+        },
+        depends: { en: ["Product compass", "Data & continuity"], zh: ["产品罗盘", "数据与连续性"] },
+        enables: { en: ["Right-time interactions", "Comfortable long-term use"], zh: ["恰当时机的互动", "舒适的长期使用"] }
+      },
+      {
+        id: "data",
+        index: "04",
+        title: { en: "Data & continuity", zh: "数据与连续性" },
+        short: { en: "Only the context needed to make companionship feel coherent.", zh: "只使用让陪伴变得连贯所需的情境。" },
+        summary: { en: "HealthKit-shaped mock data supports fast prototyping, while selective real-device validation tests what the platform can reliably provide.", zh: "用贴近 HealthKit 的 Mock 快速制作，同时通过选择性的真机验证确认平台究竟能稳定提供什么。" },
+        points: {
+          en: ["HealthKit-shaped mock inputs", "Selective personal-device validation", "Lightweight, explainable memory", "Local-first processing where practical"],
+          zh: ["贴近 HealthKit 的 Mock 输入", "选择性的个人真机验证", "轻量且可解释的记忆", "适合时优先端侧处理"]
+        },
+        depends: { en: ["Real scenario needs", "User permission"], zh: ["真实场景需要", "用户授权"] },
+        enables: { en: ["Context understanding", "Continuity over time"], zh: ["情境理解", "跨时间连续性"] }
+      },
+      {
+        id: "prototype",
+        index: "05",
+        title: { en: "Prototype & validation", zh: "原型与验证" },
+        short: { en: "Make, wear, notice, and refine.", zh: "制作、佩戴、观察、再调整。" },
+        summary: { en: "The project alternates between lightweight storyboards, repeatable scenario tests and personal Apple Watch experience rather than waiting for a perfect final plan.", zh: "项目在轻量分镜、可回放场景测试与个人 Apple Watch 体验之间交替推进，而不是等待一份完美计划。" },
+        points: {
+          en: ["Lightweight visual storyboards", "Scenario replay and decision traces", "Personal Watch testing", "Two polished slices for the first showcase"],
+          zh: ["轻量视觉分镜", "场景回放与决策记录", "个人 Watch 真机体验", "首个展示选择两个高完成度切片"]
+        },
+        depends: { en: ["Playable experiences", "Technical feasibility"], zh: ["可玩体验", "技术可行性"] },
+        enables: { en: ["Product learning", "Public case study"], zh: ["产品学习", "公开案例展示"] }
+      }
+    ];
+
+    let language = "en";
+    let selectedId = "compass";
+
+    const mapGrid = document.getElementById("mapGrid");
+    const detailPanel = document.getElementById("detailPanel");
+    const langSwitch = document.getElementById("langSwitch");
+
+    function renderMap() {
+      mapGrid.innerHTML = "";
+      modules.forEach((module) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `map-node${module.id === selectedId ? " active" : ""}`;
+        button.setAttribute("aria-pressed", module.id === selectedId ? "true" : "false");
+        button.innerHTML = `<div class="node-top"><span class="node-index">${module.index}</span><span class="arrow">↗</span></div><h3>${module.title[language]}</h3><p>${module.short[language]}</p>`;
+        button.addEventListener("click", () => {
+          selectedId = module.id;
+          renderMap();
+        });
+        mapGrid.appendChild(button);
+      });
+
+      const active = modules.find((module) => module.id === selectedId);
+      const points = active.points[language].map((item) => `<li>${item}</li>`).join("");
+      const depends = active.depends[language].map((item) => `<span class="chip">${item}</span>`).join("");
+      const enables = active.enables[language].map((item) => `<span class="chip">${item}</span>`).join("");
+      detailPanel.innerHTML = `
+        <span class="detail-tag">${language === "en" ? "Selected module" : "当前模块"} · ${active.index}</span>
+        <h3>${active.title[language]}</h3>
+        <p>${active.summary[language]}</p>
+        <ul class="detail-list">${points}</ul>
+        <div class="relation-label">${language === "en" ? "Depends on" : "它依赖"}</div>
+        <div class="chips">${depends}</div>
+        <div class="relation-label">${language === "en" ? "Enables" : "它支撑"}</div>
+        <div class="chips">${enables}</div>`;
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = language === "en" ? "en" : "zh-CN";
+      document.querySelectorAll("[data-en][data-zh]").forEach((element) => {
+        element.textContent = element.dataset[language];
+      });
+      langSwitch.textContent = language === "en" ? "中文" : "EN";
+      langSwitch.setAttribute("aria-label", language === "en" ? "切换中文" : "Switch to English");
+      langSwitch.setAttribute("aria-pressed", language === "zh" ? "true" : "false");
+      renderMap();
+    }
+
+    langSwitch.addEventListener("click", () => {
+      language = language === "en" ? "zh" : "en";
+      applyLanguage();
+    });
+
+    applyLanguage();
+  </script>
+</body>
+</html>
