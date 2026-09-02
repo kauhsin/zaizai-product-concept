@@ -86,6 +86,22 @@
       background: var(--leaf);
       box-shadow: 0 0 0 4px rgba(183,216,75,.2);
     }
+    .top-lang {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1px solid var(--coral);
+      border-radius: 999px;
+      background: var(--coral-soft);
+      color: var(--ink);
+      font-size: .76rem;
+      font-weight: 680;
+      cursor: pointer;
+    }
+    body.past-hero .top-lang { display: inline-flex; }
+    .top-lang:hover, .top-lang:focus-visible { background: #fff; outline: none; }
 
     .hero {
       min-height: 680px;
@@ -551,6 +567,7 @@
       <div class="wordmark">zaizai<span>:</span> Pet Agent</div>
       <div class="top-actions">
         <span class="status-pill" data-en="Work in progress" data-zh="进行中">Work in progress</span>
+        <button class="top-lang" id="stickyLangSwitch" data-language-switch type="button" aria-label="切换至中文版本" aria-pressed="false">中文版本</button>
       </div>
     </div>
   </header>
@@ -563,7 +580,7 @@
         <p class="hero-copy" data-en="A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side." data-zh="一只生活在 Apple Watch 上的小狗。它感知你的生活节奏，逐渐学会什么时候靠近，什么时候安静地待在身边。">A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side.</p>
         <div class="hero-actions">
           <a class="cta primary" href="#thesis" data-en="Explore the concept ↓" data-zh="从头探索 ↓">Explore the concept ↓</a>
-          <button class="cta secondary hero-lang" id="langSwitch" type="button" aria-label="切换至中文版本" aria-pressed="false">中文版本</button>
+          <button class="cta secondary hero-lang" id="heroLangSwitch" data-language-switch type="button" aria-label="切换至中文版本" aria-pressed="false">中文版本</button>
         </div>
       </div>
       <div class="watch-stage" aria-label="Abstract Apple Watch companion illustration">
@@ -800,7 +817,8 @@
 
     const mapGrid = document.getElementById("mapGrid");
     const detailPanel = document.getElementById("detailPanel");
-    const langSwitch = document.getElementById("langSwitch");
+    const languageButtons = [...document.querySelectorAll("[data-language-switch]")];
+    const hero = document.querySelector(".hero");
     const directionButtons = [...document.querySelectorAll(".direction-labels button")];
     const conversationPanel = document.getElementById("conversationPanel");
     const wechatCopy = document.getElementById("wechatCopy");
@@ -844,19 +862,31 @@
       document.querySelectorAll("[data-en][data-zh]").forEach((element) => {
         element.textContent = element.dataset[language];
       });
-      langSwitch.textContent = language === "en" ? "中文版本" : "English version";
-      langSwitch.setAttribute("aria-label", language === "en" ? "切换至中文版本" : "Switch to the English version");
-      langSwitch.setAttribute("aria-pressed", language === "zh" ? "true" : "false");
+      languageButtons.forEach((button) => {
+        button.textContent = language === "en" ? "中文版本" : "English version";
+        button.setAttribute("aria-label", language === "en" ? "切换至中文版本" : "Switch to the English version");
+        button.setAttribute("aria-pressed", language === "zh" ? "true" : "false");
+      });
       if (wechatCopy.classList.contains("copied")) {
         wechatAction.textContent = language === "en" ? "Copied" : "已复制";
       }
       renderMap();
     }
 
-    langSwitch.addEventListener("click", () => {
-      language = language === "en" ? "zh" : "en";
-      applyLanguage();
+    languageButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        language = language === "en" ? "zh" : "en";
+        applyLanguage();
+      });
     });
+
+    function updateStickyLanguage() {
+      const heroBottom = hero.offsetTop + hero.offsetHeight;
+      document.body.classList.toggle("past-hero", window.scrollY + 72 >= heroBottom);
+    }
+
+    window.addEventListener("scroll", updateStickyLanguage, { passive: true });
+    window.addEventListener("resize", updateStickyLanguage);
 
     directionButtons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -929,6 +959,7 @@
     });
 
     applyLanguage();
+    updateStickyLanguage();
   </script>
 </body>
 </html>
