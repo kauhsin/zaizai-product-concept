@@ -389,17 +389,76 @@
     }
     .curtain h2 { max-width: 760px; }
     .curtain p { max-width: 700px; color: rgba(244,239,229,.68); }
-    .direction-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 36px; max-width: 920px; }
-    .direction-labels span {
+    .direction-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 16px; max-width: 920px; }
+    .direction-labels button {
       padding: 10px 14px;
       border: 1px solid rgba(244,239,229,.22);
       border-radius: 999px;
       background: rgba(255,255,255,.04);
       color: rgba(244,239,229,.9);
       font-size: .87rem;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
     }
+    .direction-labels button:hover, .direction-labels button:focus-visible {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.1);
+      border-color: rgba(244,239,229,.45);
+      outline: none;
+    }
+    .direction-labels button.active {
+      background: var(--leaf);
+      border-color: var(--leaf);
+      color: var(--ink);
+    }
+    .direction-prompt { margin: 0; color: rgba(244,239,229,.45) !important; font-size: .78rem; }
+    .conversation-panel { margin-top: 32px; animation: reveal .28s ease both; }
+    .conversation-panel[hidden] { display: none; }
     .interview-note { display: inline-flex; gap: 10px; align-items: center; color: var(--leaf); font-weight: 720; }
     .interview-note::before { content: "↳"; font-size: 1.25rem; }
+    .contact-invite {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 28px;
+      align-items: end;
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(244,239,229,.16);
+    }
+    .contact-kicker {
+      display: block;
+      margin-bottom: 7px;
+      color: rgba(244,239,229,.55);
+      font-size: .7rem;
+      font-weight: 760;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .contact-invite p { margin: 0; max-width: 570px; color: rgba(244,239,229,.84); }
+    .contact-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+    .contact-link {
+      min-width: 178px;
+      padding: 12px 14px;
+      border: 1px solid rgba(244,239,229,.24);
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      color: var(--paper);
+      text-decoration: none;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .contact-link:hover, .contact-link:focus-visible {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.11);
+      border-color: rgba(244,239,229,.45);
+      outline: none;
+    }
+    .contact-link small, .contact-link strong, .contact-link span { display: block; }
+    .contact-link small { color: var(--leaf); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
+    .contact-link strong { margin-top: 2px; font-size: .88rem; font-weight: 680; overflow-wrap: anywhere; }
+    .contact-link span { margin-top: 4px; color: rgba(244,239,229,.52); font-size: .69rem; }
+    .contact-link.copied { background: rgba(183,216,75,.13); border-color: rgba(183,216,75,.52); }
 
     .progress-wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 55px; margin-top: 44px; }
     .meta-card { padding: 28px; border-radius: var(--radius); background: var(--coral-soft); }
@@ -422,6 +481,10 @@
       0%, 100% { transform: translateY(0) rotate(0); }
       50% { transform: translateY(-12px) rotate(3deg); }
     }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; gap: 28px; padding-top: 68px; }
@@ -433,6 +496,8 @@
       .flow-step:not(:last-child)::after { content: "↓"; top: auto; right: 50%; bottom: -18px; transform: translateX(50%); }
       .map-layout, .progress-wrap { grid-template-columns: 1fr; }
       .detail-panel { position: static; min-height: 0; }
+      .contact-invite { grid-template-columns: 1fr; align-items: start; }
+      .contact-actions { justify-content: flex-start; }
     }
 
     @media (max-width: 620px) {
@@ -445,6 +510,8 @@
       .map-grid, .slice-grid { grid-template-columns: 1fr; }
       .map-node:first-child { grid-column: auto; }
       .map-next { grid-template-columns: 1fr; }
+      .contact-actions { display: grid; grid-template-columns: 1fr; }
+      .contact-link { width: 100%; }
       .footer-inner { display: block; }
     }
 
@@ -568,9 +635,37 @@
           <h2 data-en="A deeper companion system is taking shape." data-zh="一套更深的陪伴系统，正在逐渐成形。">A deeper companion system is taking shape.</h2>
           <p data-en="The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha." data-zh="这个概念还在延展到角色一致性、持续生长的故事、关系发展、情绪节奏与更长期的产品可能性。它们共同影响 zaizai 如何从第一个 Alpha 继续成长。">The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha.</p>
           <div class="direction-labels" aria-label="Further design areas">
-            <span>Character Bible</span><span>Story System</span><span>Relationship Model</span><span>Emotion Transitions</span><span>Pacing &amp; Conditions</span><span>Memory Design</span><span>Evaluation Cases</span><span>Long-term Product Paths</span>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Character Bible</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Story System</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Relationship Model</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Emotion Transitions</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Pacing &amp; Conditions</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Memory Design</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Evaluation Cases</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Long-term Product Paths</button>
           </div>
-          <div class="interview-note" data-en="Selected design decisions are best unpacked through conversation." data-zh="其中的关键设计取舍，更适合在交流中展开。">Selected design decisions are best unpacked through conversation.</div>
+          <p class="direction-prompt" data-en="Choose any direction to continue the conversation." data-zh="点击任一方向，继续展开交流。">Choose any direction to continue the conversation.</p>
+          <div class="conversation-panel" id="conversationPanel" hidden aria-live="polite">
+            <div class="interview-note" data-en="Selected design decisions are best unpacked through conversation." data-zh="其中的关键设计取舍，更适合在交流中展开。">Selected design decisions are best unpacked through conversation.</div>
+            <div class="contact-invite">
+              <div>
+                <span class="contact-kicker" data-en="Open to a virtual coffee chat" data-zh="欢迎约一次线上 Coffee Chat">Open to a virtual coffee chat</span>
+                <p data-en="If one of these directions sparks a question, let’s talk about the product thinking, agent behavior, or work in progress behind it." data-zh="如果其中一个方向让你产生了问题，欢迎来聊它背后的产品思考、Agent 行为，或正在发生的尝试。">If one of these directions sparks a question, let’s talk about the product thinking, agent behavior, or work in progress behind it.</p>
+              </div>
+              <div class="contact-actions">
+                <a class="contact-link" href="mailto:kauhsin@sas.upenn.edu?subject=zaizai%3A%20Pet%20Agent">
+                  <small>Email</small>
+                  <strong>kauhsin@sas.upenn.edu</strong>
+                  <span data-en="Write to me ↗" data-zh="发送邮件 ↗">Write to me ↗</span>
+                </a>
+                <button class="contact-link" id="wechatCopy" type="button" aria-label="Copy WeChat ID kauhsin">
+                  <small>WeChat</small>
+                  <strong>kauhsin</strong>
+                  <span id="wechatAction" data-en="Copy ID" data-zh="复制微信号">Copy ID</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -679,6 +774,11 @@
     const mapGrid = document.getElementById("mapGrid");
     const detailPanel = document.getElementById("detailPanel");
     const langSwitch = document.getElementById("langSwitch");
+    const directionButtons = [...document.querySelectorAll(".direction-labels button")];
+    const conversationPanel = document.getElementById("conversationPanel");
+    const wechatCopy = document.getElementById("wechatCopy");
+    const wechatAction = document.getElementById("wechatAction");
+    let wechatResetTimer;
 
     function renderMap() {
       mapGrid.innerHTML = "";
@@ -718,12 +818,43 @@
       langSwitch.textContent = language === "en" ? "中文" : "EN";
       langSwitch.setAttribute("aria-label", language === "en" ? "切换中文" : "Switch to English");
       langSwitch.setAttribute("aria-pressed", language === "zh" ? "true" : "false");
+      if (wechatCopy.classList.contains("copied")) {
+        wechatAction.textContent = language === "en" ? "Copied" : "已复制";
+      }
       renderMap();
     }
 
     langSwitch.addEventListener("click", () => {
       language = language === "en" ? "zh" : "en";
       applyLanguage();
+    });
+
+    directionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        directionButtons.forEach((item) => {
+          const isSelected = item === button;
+          item.classList.toggle("active", isSelected);
+          item.setAttribute("aria-pressed", isSelected ? "true" : "false");
+          item.setAttribute("aria-expanded", isSelected ? "true" : "false");
+        });
+        conversationPanel.hidden = false;
+      });
+    });
+
+    wechatCopy.addEventListener("click", async () => {
+      try {
+        if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+        await navigator.clipboard.writeText("kauhsin");
+        wechatCopy.classList.add("copied");
+        wechatAction.textContent = language === "en" ? "Copied" : "已复制";
+        window.clearTimeout(wechatResetTimer);
+        wechatResetTimer = window.setTimeout(() => {
+          wechatCopy.classList.remove("copied");
+          wechatAction.textContent = wechatAction.dataset[language];
+        }, 1600);
+      } catch {
+        window.prompt(language === "en" ? "Copy WeChat ID:" : "复制微信号：", "kauhsin");
+      }
     });
 
     applyLanguage();
