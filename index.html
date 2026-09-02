@@ -67,7 +67,7 @@
     .wordmark { font-weight: 760; letter-spacing: -.035em; font-size: 1.07rem; }
     .wordmark span { color: var(--coral); }
     .top-actions { display: flex; align-items: center; gap: 12px; }
-    .status-pill, .lang-switch {
+    .status-pill {
       border: 1px solid var(--line);
       border-radius: 999px;
       background: rgba(255,255,255,.5);
@@ -86,8 +86,6 @@
       background: var(--leaf);
       box-shadow: 0 0 0 4px rgba(183,216,75,.2);
     }
-    .lang-switch { cursor: pointer; min-width: 62px; }
-    .lang-switch:hover, .lang-switch:focus-visible { background: #fff; outline: none; }
 
     .hero {
       min-height: 680px;
@@ -139,6 +137,12 @@
     }
     .cta.primary { background: var(--ink); color: var(--paper); }
     .cta.secondary { background: rgba(255,255,255,.5); }
+    .hero-lang {
+      min-width: 116px;
+      cursor: pointer;
+      background: var(--coral-soft) !important;
+      border-color: var(--coral);
+    }
     .cta:hover, .cta:focus-visible { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(29,41,40,.14); outline: none; }
 
     .watch-stage { position: relative; min-height: 470px; display: grid; place-items: center; }
@@ -386,7 +390,9 @@
       bottom: -180px;
       border-radius: 50%;
       border: 70px solid rgba(183,216,75,.13);
+      pointer-events: none;
     }
+    .curtain > * { position: relative; z-index: 1; }
     .curtain h2 { max-width: 760px; }
     .curtain p { max-width: 700px; color: rgba(244,239,229,.68); }
     .direction-labels { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 16px; max-width: 920px; }
@@ -459,6 +465,25 @@
     .contact-link strong { margin-top: 2px; font-size: .88rem; font-weight: 680; overflow-wrap: anywhere; }
     .contact-link span { margin-top: 4px; color: rgba(244,239,229,.52); font-size: .69rem; }
     .contact-link.copied { background: rgba(183,216,75,.13); border-color: rgba(183,216,75,.52); }
+    .copy-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 80;
+      max-width: calc(100% - 32px);
+      padding: 11px 16px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--paper);
+      box-shadow: 0 16px 42px rgba(29,41,40,.24);
+      font-size: .82rem;
+      font-weight: 680;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .copy-toast.show { opacity: 1; transform: translate(-50%, 0); }
 
     .progress-wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 55px; margin-top: 44px; }
     .meta-card { padding: 28px; border-radius: var(--radius); background: var(--coral-soft); }
@@ -526,7 +551,6 @@
       <div class="wordmark">zaizai<span>:</span> Pet Agent</div>
       <div class="top-actions">
         <span class="status-pill" data-en="Work in progress" data-zh="进行中">Work in progress</span>
-        <button class="lang-switch" id="langSwitch" type="button" aria-label="切换中文" aria-pressed="false">中文</button>
       </div>
     </div>
   </header>
@@ -539,6 +563,7 @@
         <p class="hero-copy" data-en="A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side." data-zh="一只生活在 Apple Watch 上的小狗。它感知你的生活节奏，逐渐学会什么时候靠近，什么时候安静地待在身边。">A tiny companion for Apple Watch that can sense the rhythm of your day — learning when to come closer, and when to stay quietly by your side.</p>
         <div class="hero-actions">
           <a class="cta primary" href="#thesis" data-en="Explore the concept ↓" data-zh="从头探索 ↓">Explore the concept ↓</a>
+          <button class="cta secondary hero-lang" id="langSwitch" type="button" aria-label="切换至中文版本" aria-pressed="false">中文版本</button>
         </div>
       </div>
       <div class="watch-stage" aria-label="Abstract Apple Watch companion illustration">
@@ -635,14 +660,14 @@
           <h2 data-en="A deeper companion system is taking shape." data-zh="一套更深的陪伴系统，正在逐渐成形。">A deeper companion system is taking shape.</h2>
           <p data-en="The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha." data-zh="这个概念还在延展到角色一致性、持续生长的故事、关系发展、情绪节奏与更长期的产品可能性。它们共同影响 zaizai 如何从第一个 Alpha 继续成长。">The concept continues into character consistency, evolving stories, relationship development, emotional rhythm and longer-term product possibilities. These directions shape how zaizai could grow beyond the first Alpha.</p>
           <div class="direction-labels" aria-label="Further design areas">
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Character Bible</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Story System</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Relationship Model</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Emotion Transitions</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Pacing &amp; Conditions</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Memory Design</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Evaluation Cases</button>
-            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false">Long-term Product Paths</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Character Bible" data-zh="角色设定">Character Bible</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Story System" data-zh="故事系统">Story System</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Relationship Model" data-zh="关系模型">Relationship Model</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Emotion Transitions" data-zh="情绪转换">Emotion Transitions</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Pacing &amp; Conditions" data-zh="节奏与触发条件">Pacing &amp; Conditions</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Memory Design" data-zh="记忆设计">Memory Design</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Evaluation Cases" data-zh="评测场景">Evaluation Cases</button>
+            <button type="button" aria-controls="conversationPanel" aria-expanded="false" aria-pressed="false" data-en="Long-term Product Paths" data-zh="长期产品路径">Long-term Product Paths</button>
           </div>
           <p class="direction-prompt" data-en="Choose any direction to continue the conversation." data-zh="点击任一方向，继续展开交流。">Choose any direction to continue the conversation.</p>
           <div class="conversation-panel" id="conversationPanel" hidden aria-live="polite">
@@ -698,6 +723,8 @@
       <span data-en="Independent product concept · Selected public view · 2026" data-zh="独立产品概念 · 精选公开版本 · 2026">Independent product concept · Selected public view · 2026</span>
     </div>
   </footer>
+
+  <div class="copy-toast" id="copyToast" role="status" aria-live="polite"></div>
 
   <script>
     const modules = [
@@ -778,7 +805,9 @@
     const conversationPanel = document.getElementById("conversationPanel");
     const wechatCopy = document.getElementById("wechatCopy");
     const wechatAction = document.getElementById("wechatAction");
+    const copyToast = document.getElementById("copyToast");
     let wechatResetTimer;
+    let copyToastTimer;
 
     function renderMap() {
       mapGrid.innerHTML = "";
@@ -815,8 +844,8 @@
       document.querySelectorAll("[data-en][data-zh]").forEach((element) => {
         element.textContent = element.dataset[language];
       });
-      langSwitch.textContent = language === "en" ? "中文" : "EN";
-      langSwitch.setAttribute("aria-label", language === "en" ? "切换中文" : "Switch to English");
+      langSwitch.textContent = language === "en" ? "中文版本" : "English version";
+      langSwitch.setAttribute("aria-label", language === "en" ? "切换至中文版本" : "Switch to the English version");
       langSwitch.setAttribute("aria-pressed", language === "zh" ? "true" : "false");
       if (wechatCopy.classList.contains("copied")) {
         wechatAction.textContent = language === "en" ? "Copied" : "已复制";
@@ -841,20 +870,62 @@
       });
     });
 
-    wechatCopy.addEventListener("click", async () => {
+    function copyWithFallback(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      textarea.style.pointerEvents = "none";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(0, text.length);
+      let copied = false;
       try {
-        if (!navigator.clipboard) throw new Error("Clipboard unavailable");
-        await navigator.clipboard.writeText("kauhsin");
-        wechatCopy.classList.add("copied");
-        wechatAction.textContent = language === "en" ? "Copied" : "已复制";
-        window.clearTimeout(wechatResetTimer);
-        wechatResetTimer = window.setTimeout(() => {
-          wechatCopy.classList.remove("copied");
-          wechatAction.textContent = wechatAction.dataset[language];
-        }, 1600);
+        copied = document.execCommand("copy");
       } catch {
-        window.prompt(language === "en" ? "Copy WeChat ID:" : "复制微信号：", "kauhsin");
+        copied = false;
       }
+      textarea.remove();
+      wechatCopy.focus();
+      return copied;
+    }
+
+    function showCopyResult(copied) {
+      const successText = language === "en" ? "WeChat ID copied: kauhsin ✓" : "微信号已复制：kauhsin ✓";
+      const failureText = language === "en" ? "Copy unavailable — WeChat ID: kauhsin" : "未能自动复制——微信号：kauhsin";
+      copyToast.textContent = copied ? successText : failureText;
+      copyToast.classList.add("show");
+      window.clearTimeout(copyToastTimer);
+      copyToastTimer = window.setTimeout(() => copyToast.classList.remove("show"), 2600);
+    }
+
+    wechatCopy.addEventListener("click", async () => {
+      wechatAction.textContent = language === "en" ? "Copying…" : "复制中…";
+      let copied = false;
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText("kauhsin");
+          copied = true;
+        } catch {
+          copied = false;
+        }
+      }
+      if (!copied) copied = copyWithFallback("kauhsin");
+
+      if (copied) {
+        wechatCopy.classList.add("copied");
+        wechatAction.textContent = language === "en" ? "Copied ✓" : "已复制 ✓";
+      } else {
+        wechatAction.textContent = language === "en" ? "Copy unavailable" : "未能自动复制";
+      }
+      showCopyResult(copied);
+      window.clearTimeout(wechatResetTimer);
+      wechatResetTimer = window.setTimeout(() => {
+        wechatCopy.classList.remove("copied");
+        wechatAction.textContent = wechatAction.dataset[language];
+      }, 2600);
     });
 
     applyLanguage();
