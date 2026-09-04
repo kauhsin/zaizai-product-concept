@@ -1,0 +1,2016 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zaizai: Pet Agent · MVP 01「散步中的小花」Wireflow V0.6</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --wf-page: #f5f3ee;
+      --wf-paper: #fffdfa;
+      --wf-paper-soft: #efede7;
+      --wf-screen: #f9f8f4;
+      --wf-ink: #24231f;
+      --wf-muted: #69655d;
+      --wf-line: #cbc5b9;
+      --wf-border: #d8d2c6;
+      --wf-accent: #5d5b91;
+      --wf-accent-soft: #eceafa;
+      --wf-accent-ink: #393764;
+      --wf-agent: #94632f;
+      --wf-agent-soft: #f6e9da;
+      --wf-update: #3f735a;
+      --wf-update-soft: #e5f0e9;
+      --wf-shadow: 0 14px 36px rgba(44, 40, 32, 0.08);
+      --wf-focus: #315fbb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --wf-page: #171715;
+        --wf-paper: #22221f;
+        --wf-paper-soft: #2c2b27;
+        --wf-screen: #1d1d1a;
+        --wf-ink: #f2efe8;
+        --wf-muted: #b8b2a8;
+        --wf-line: #5b574f;
+        --wf-border: #48453f;
+        --wf-accent: #aaa6ef;
+        --wf-accent-soft: #353351;
+        --wf-accent-ink: #f0eeff;
+        --wf-agent: #e0a468;
+        --wf-agent-soft: #483622;
+        --wf-update: #8bc6a7;
+        --wf-update-soft: #263e32;
+        --wf-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+        --wf-focus: #8cb2ff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--wf-page);
+      color: var(--wf-ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    .view-switch a:focus-visible {
+      outline: 3px solid var(--wf-focus);
+      outline-offset: 3px;
+    }
+
+    .page {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 54px 0 90px;
+    }
+
+    .view-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 24px;
+    }
+
+    .view-switch a {
+      padding: 7px 12px;
+      color: var(--wf-ink);
+      background: var(--wf-paper);
+      border: 1px solid var(--wf-border);
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .view-switch a[aria-current="page"] {
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border-color: var(--wf-accent);
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    dl,
+    dd {
+      margin-top: 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--wf-accent);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 860px;
+      margin-bottom: 14px;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.16;
+      letter-spacing: -0.035em;
+    }
+
+    .title-line {
+      display: block;
+    }
+
+    .lede {
+      max-width: 830px;
+      margin-bottom: 28px;
+      color: var(--wf-muted);
+      font-size: 19px;
+    }
+
+    .scope-note {
+      max-width: 850px;
+      margin: 0 0 34px;
+      padding-left: 16px;
+      border-left: 4px solid var(--wf-accent);
+      font-size: 16px;
+    }
+
+    .controls {
+      margin-bottom: 48px;
+      padding: 24px;
+      background: var(--wf-paper);
+      border: 1px solid var(--wf-border);
+      border-radius: 20px;
+      box-shadow: var(--wf-shadow);
+    }
+
+    .controls h2 {
+      margin-bottom: 5px;
+      font-size: 21px;
+    }
+
+    .controls-help {
+      margin-bottom: 16px;
+      color: var(--wf-muted);
+      font-size: 16px;
+    }
+
+    .route-buttons,
+    .state-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .route-button,
+    .state-button {
+      min-height: 46px;
+      padding: 9px 15px;
+      color: var(--wf-ink);
+      background: var(--wf-paper-soft);
+      border: 1px solid var(--wf-border);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .route-button:hover,
+    .state-button:hover {
+      border-color: var(--wf-accent);
+    }
+
+    .route-button[aria-pressed="true"],
+    .state-button[aria-pressed="true"] {
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border-color: var(--wf-accent);
+      font-weight: 800;
+    }
+
+    .current-route {
+      margin: 18px 0 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--wf-border);
+      font-size: 17px;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      margin: 0 0 36px;
+      padding: 0;
+      list-style: none;
+      color: var(--wf-muted);
+      font-size: 14px;
+    }
+
+    .legend li {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-mark {
+      display: inline-grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .legend-mark.agent {
+      color: var(--wf-agent);
+      background: var(--wf-agent-soft);
+    }
+
+    .flow {
+      position: relative;
+    }
+
+    .stage {
+      position: relative;
+      padding: 0 0 54px 84px;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      top: 58px;
+      bottom: -2px;
+      left: 28px;
+      width: 2px;
+      background: var(--wf-line);
+    }
+
+    .stage:last-child::before {
+      display: none;
+    }
+
+    .stage-number {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border: 2px solid var(--wf-accent);
+      border-radius: 50%;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .stage-body {
+      padding: 28px 30px 32px;
+      background: var(--wf-paper);
+      border: 1px solid var(--wf-border);
+      border-radius: 22px;
+      box-shadow: var(--wf-shadow);
+    }
+
+    .stage-kicker {
+      margin-bottom: 4px;
+      color: var(--wf-muted);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .stage h2 {
+      margin-bottom: 8px;
+      font-size: 28px;
+      line-height: 1.3;
+    }
+
+    .stage-lead {
+      max-width: 820px;
+      margin-bottom: 24px;
+      color: var(--wf-muted);
+      font-size: 17px;
+    }
+
+    .device-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.15fr) minmax(250px, 0.85fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .device-grid.two-phone {
+      grid-template-columns: repeat(2, minmax(300px, 1fr));
+    }
+
+    .device-grid.two-phone.is-single {
+      grid-template-columns: 1fr;
+    }
+
+    .device-column {
+      min-width: 0;
+    }
+
+    .device-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .device-heading strong {
+      font-size: 17px;
+    }
+
+    .device-heading span {
+      color: var(--wf-muted);
+      font-size: 13px;
+    }
+
+    .phone,
+    .watch {
+      margin: 0 auto;
+      padding: 9px;
+      background: var(--wf-ink);
+      box-shadow: 0 9px 24px rgba(40, 37, 31, 0.14);
+    }
+
+    .phone {
+      width: min(100%, 310px);
+      aspect-ratio: 310 / 538;
+      border-radius: 36px;
+    }
+
+    .watch {
+      width: min(100%, 270px);
+      aspect-ratio: 270 / 326;
+      border-radius: 48px;
+    }
+
+    .phone-screen,
+    .watch-screen {
+      position: relative;
+      overflow: hidden;
+      color: var(--wf-ink);
+      background: var(--wf-screen);
+      border: 1px solid var(--wf-border);
+    }
+
+    .phone-screen {
+      height: 100%;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 14px 16px 18px;
+      border-radius: 28px;
+    }
+
+    .watch-screen {
+      height: 100%;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 11px;
+      border-radius: 39px;
+      scrollbar-color: var(--wf-line) transparent;
+      scrollbar-width: thin;
+    }
+
+    .watch-screen::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .watch-screen::-webkit-scrollbar-thumb {
+      background: var(--wf-line);
+      border-radius: 999px;
+    }
+
+    .home-watch-screen {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-watch-screen .art-stage {
+      display: flex;
+      min-height: 0;
+      flex: 1;
+      justify-content: center;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .watch .home-watch-screen .art-placeholder {
+      width: 78%;
+      height: 100%;
+      min-height: 0;
+      margin: 0 auto;
+    }
+
+    .home-watch-screen > .screen-action {
+      flex: 0 0 auto;
+      margin-top: 0;
+    }
+
+    .walking-phone-screen .art-placeholder,
+    #phone-no-prompt .art-placeholder {
+      min-height: 300px;
+    }
+
+    .watch .walking-watch-screen .art-placeholder,
+    .watch #watch-no-prompt .art-placeholder {
+      width: 84%;
+      min-height: 188px;
+    }
+
+    .event-phone-screen > .art-placeholder {
+      min-height: 205px;
+    }
+
+    .watch .event-watch-screen > .art-placeholder {
+      width: 68%;
+      min-height: 112px;
+      margin: 2px auto 6px;
+    }
+
+    .watch .event-watch-screen .status-bar {
+      margin-bottom: 8px;
+    }
+
+    .watch .event-watch-screen .screen-title,
+    .watch .event-watch-screen .screen-copy {
+      margin-bottom: 4px;
+    }
+
+    .watch .event-watch-screen .screen-actions {
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .watch .event-watch-screen .screen-action.small {
+      min-height: 28px;
+      padding: 4px 7px;
+    }
+
+    .end-phone-screen > .art-placeholder {
+      min-height: 225px;
+    }
+
+    .summary-phone-screen > .art-placeholder {
+      min-height: 200px;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .screen-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .screen-title {
+      margin-bottom: 10px;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .watch .screen-title {
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    .watch .screen-copy {
+      margin-bottom: 8px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .screen-copy {
+      margin-bottom: 12px;
+      color: var(--wf-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .art-placeholder {
+      display: grid;
+      min-height: 180px;
+      margin: 10px 0 14px;
+      padding: 16px;
+      place-items: center;
+      color: var(--wf-muted);
+      background: var(--wf-paper-soft);
+      border: 2px dashed var(--wf-line);
+      border-radius: 18px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: pre-line;
+    }
+
+    .watch .art-placeholder {
+      width: 84%;
+      min-height: 76px;
+      margin: 6px auto 8px;
+      padding: 9px;
+      border-radius: 15px;
+      font-size: 11px;
+    }
+
+    .watch .art-placeholder.compact {
+      width: 68%;
+    }
+
+    .art-placeholder.compact {
+      min-height: 102px;
+    }
+
+    .art-stage {
+      position: relative;
+    }
+
+    .wire-bubble {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      z-index: 1;
+      width: max-content;
+      max-width: 80%;
+      margin: 0;
+      padding: 5px 10px;
+      transform: translateX(-50%);
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border: 1px solid var(--wf-accent);
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .watch .wire-bubble {
+      top: 14px;
+      font-size: 10px;
+    }
+
+    .screen-actions {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .screen-action {
+      min-height: 42px;
+      padding: 10px 12px;
+      color: var(--wf-ink);
+      background: var(--wf-paper-soft);
+      border: 1px solid var(--wf-border);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .screen-action.primary,
+    .screen-action.is-selected {
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border-color: var(--wf-accent);
+    }
+
+    .screen-action.small {
+      min-height: 34px;
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+
+    button.screen-action {
+      width: 100%;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .book-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .book-tile {
+      min-height: 48px;
+      padding: 8px 4px;
+      background: var(--wf-paper-soft);
+      border: 1px solid var(--wf-border);
+      border-radius: 10px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .book-tile.is-updated {
+      color: var(--wf-update);
+      background: var(--wf-update-soft);
+      border-color: var(--wf-update);
+    }
+
+    .prompt-banner,
+    .pending-banner {
+      margin-bottom: 10px;
+      padding: 10px 11px;
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border: 1px solid var(--wf-accent);
+      border-radius: 13px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .prompt-card {
+      padding: 12px;
+      background: var(--wf-accent-soft);
+      border: 1px solid var(--wf-accent);
+      border-radius: 16px;
+    }
+
+    .prompt-card.is-full {
+      display: flex;
+      min-height: 415px;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .watch .prompt-card.is-full {
+      min-height: 0;
+      padding: 10px;
+    }
+
+    .prompt-card strong {
+      display: block;
+      margin-bottom: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .prompt-visuals {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 4px 0 16px;
+    }
+
+    .prompt-icon {
+      display: grid;
+      width: 112px;
+      min-height: 112px;
+      padding: 8px;
+      place-items: center;
+      color: var(--wf-muted);
+      background: var(--wf-paper);
+      border: 2px dashed var(--wf-line);
+      border-radius: 50%;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .watch .prompt-icon {
+      width: 72px;
+      min-height: 72px;
+      padding: 5px;
+      font-size: 8px;
+    }
+
+    .watch .prompt-visuals {
+      gap: 8px;
+      margin: 0 0 8px;
+    }
+
+    .watch .prompt-card strong {
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .watch .prompt-option {
+      min-height: 28px;
+      padding: 4px 6px;
+      font-size: 10px;
+    }
+
+    .watch .screen-actions {
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .watch .screen-action.small {
+      min-height: 30px;
+      padding: 5px 7px;
+      font-size: 11px;
+    }
+
+    .prompt-options {
+      display: grid;
+      gap: 6px;
+    }
+
+    .prompt-option {
+      width: 100%;
+      padding: 7px 8px;
+      background: var(--wf-paper);
+      border: 1px solid var(--wf-border);
+      border-radius: 9px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .prompt-option.is-selected {
+      color: var(--wf-accent-ink);
+      border-color: var(--wf-accent);
+      font-weight: 800;
+    }
+
+    .screen-modal {
+      margin-top: 18px;
+      padding: 14px;
+      background: var(--wf-paper);
+      border: 2px solid var(--wf-ink);
+      border-radius: 16px;
+      box-shadow: 0 8px 18px rgba(30, 28, 24, 0.12);
+    }
+
+    .screen-modal strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 15px;
+    }
+
+    .state-control {
+      margin: 22px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--wf-border);
+    }
+
+    .state-control strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .micro-loop,
+    .transition-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .micro-node,
+    .transition-node {
+      position: relative;
+      padding: 13px 14px;
+      background: var(--wf-paper-soft);
+      border-radius: 13px;
+      font-size: 14px;
+    }
+
+    .micro-node strong,
+    .transition-node strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .micro-node span,
+    .transition-node span {
+      color: var(--wf-muted);
+      font-size: 12px;
+    }
+
+    .content-branch {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--wf-border);
+    }
+
+    .content-branch h3 {
+      margin-bottom: 10px;
+      font-size: 17px;
+    }
+
+    .branch-pages {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .branch-page {
+      padding: 13px 14px;
+      background: var(--wf-paper-soft);
+      border-radius: 13px;
+    }
+
+    .branch-page strong,
+    .branch-page span {
+      display: block;
+    }
+
+    .branch-page strong {
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+
+    .branch-page span {
+      color: var(--wf-muted);
+      font-size: 12px;
+    }
+
+    .flow-note {
+      margin: 20px 0 0;
+      padding-left: 15px;
+      color: var(--wf-muted);
+      border-left: 3px solid var(--wf-line);
+      font-size: 15px;
+    }
+
+    .agent-lane {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+      padding: 18px;
+      background: var(--wf-agent-soft);
+      border-left: 5px solid var(--wf-agent);
+      border-radius: 0 16px 16px 0;
+    }
+
+    .agent-node {
+      padding: 12px 14px;
+      background: var(--wf-paper);
+      border-radius: 12px;
+    }
+
+    .agent-node strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--wf-agent);
+      font-size: 14px;
+    }
+
+    .agent-node span {
+      font-size: 13px;
+    }
+
+    .agent-result {
+      color: var(--wf-accent-ink);
+      background: var(--wf-accent-soft);
+      border: 1px solid var(--wf-accent);
+    }
+
+    .agent-result.is-silent {
+      color: var(--wf-muted);
+      background: var(--wf-paper-soft);
+      border-color: var(--wf-line);
+    }
+
+    .device-grid.after-transition {
+      margin-top: 26px;
+    }
+
+    .result-panel {
+      display: grid;
+      grid-template-columns: minmax(160px, 0.7fr) minmax(240px, 1.3fr);
+      gap: 16px;
+      margin-top: 24px;
+      padding: 18px;
+      background: var(--wf-paper-soft);
+      border-radius: 16px;
+    }
+
+    .result-panel .art-placeholder {
+      min-height: 120px;
+      margin: 0;
+      background: var(--wf-paper);
+    }
+
+    .result-panel h3 {
+      margin-bottom: 5px;
+      font-size: 19px;
+    }
+
+    .result-panel p {
+      margin-bottom: 0;
+      color: var(--wf-muted);
+      font-size: 15px;
+    }
+
+    .summary-extra {
+      margin: 12px 0;
+      padding: 12px;
+      color: var(--wf-update);
+      background: var(--wf-update-soft);
+      border-left: 4px solid var(--wf-update);
+      border-radius: 0 12px 12px 0;
+      font-size: 13px;
+    }
+
+    .content-list {
+      display: grid;
+      gap: 9px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .content-item {
+      padding: 11px 12px;
+      background: var(--wf-paper-soft);
+      border: 1px solid var(--wf-border);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .content-item strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 13px;
+    }
+
+    .content-item span {
+      color: var(--wf-muted);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      display: grid;
+      min-height: 190px;
+      margin-top: 18px;
+      padding: 20px;
+      place-items: center;
+      color: var(--wf-muted);
+      background: var(--wf-paper-soft);
+      border-radius: 16px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .final-note {
+      margin: 4px 0 0 84px;
+      padding: 20px 24px;
+      color: var(--wf-muted);
+      background: var(--wf-paper-soft);
+      border-radius: 16px;
+      font-size: 15px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 820px) {
+      .page {
+        width: min(100% - 26px, 1160px);
+        padding-top: 34px;
+      }
+
+      .device-grid,
+      .device-grid.two-phone,
+      .agent-lane,
+      .micro-loop,
+      .branch-pages,
+      .transition-strip,
+      .result-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .device-grid {
+        gap: 34px;
+      }
+
+      .stage-body,
+      .controls {
+        padding: 22px;
+      }
+
+      .stage {
+        padding-left: 66px;
+      }
+
+      .stage::before {
+        left: 23px;
+        top: 48px;
+      }
+
+      .stage-number {
+        width: 48px;
+        height: 48px;
+        font-size: 13px;
+      }
+
+      .final-note {
+        margin-left: 66px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      body {
+        font-size: 17px;
+      }
+
+      .page {
+        width: min(100% - 18px, 1160px);
+      }
+
+      .title-tail {
+        display: block;
+      }
+
+      .stage {
+        padding: 0 0 40px;
+      }
+
+      .stage::before {
+        display: none;
+      }
+
+      .stage-number {
+        position: relative;
+        margin-bottom: 10px;
+      }
+
+      .stage-body,
+      .controls {
+        padding: 19px;
+        border-radius: 17px;
+      }
+
+      .stage h2 {
+        font-size: 24px;
+      }
+
+      .final-note {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .watch .walking-watch-screen .art-placeholder,
+      .watch #watch-no-prompt .art-placeholder {
+        min-height: 180px;
+      }
+
+      .watch .event-watch-screen > .art-placeholder {
+        min-height: 106px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="zaizai-wireflow">
+    <header>
+      <nav class="view-switch" aria-label="项目页面">
+        <a href="../../">产品总览</a>
+        <a href="../">用户流程</a>
+        <a href="./" aria-current="page">界面流程图 Wireflow</a>
+      </nav>
+      <p class="eyebrow">zaizai: Pet Agent · MVP 01 · Wireflow V0.6</p>
+      <h1>「散步中的小花」<span class="title-line">界面流程图 <span class="title-tail">Wireflow</span></span></h1>
+      <p class="lede">用简化的 iPhone／Apple Watch 页面线框，把首页待机、散步、Agent 介入、小花分支、总结和内容回看组装成一条可阅读的端到端路径。</p>
+      <p class="scope-note"><strong>阅读边界：</strong>所有 zaizai、小花、照片与收藏品区域都是功能占位，不代表最终构图、美术风格、颜色或动效质量。所有 Apple Watch 页面统一使用固定的 48 mm MVP 基准画布；内容较多时在表内排版或滚动，表壳不会随内容变长。角色与事件画面仍是页面主视觉，不因固定设备尺寸被统一压扁。</p>
+
+      <section class="controls" aria-labelledby="route-title">
+        <h2 id="route-title">选择一条路径查看</h2>
+        <p class="controls-help">每次只展开一个结果分支；iPhone 与 Watch 的共同状态会一起更新。</p>
+        <div class="route-buttons" role="group" aria-label="Wireflow 路径">
+          <button class="route-button" type="button" data-route="bring" aria-pressed="true">带花回家</button>
+          <button class="route-button" type="button" data-route="photo" aria-pressed="false">拍张合影</button>
+          <button class="route-button" type="button" data-route="pat" aria-pressed="false">拍拍 zaizai</button>
+          <button class="route-button" type="button" data-route="wait" aria-pressed="false">等我一下 → 结束</button>
+          <button class="route-button" type="button" data-route="dismiss" aria-pressed="false">继续散步</button>
+          <button class="route-button" type="button" data-route="silent" aria-pressed="false">Agent 暂不介入</button>
+        </div>
+        <p class="current-route" id="current-route" aria-live="polite"></p>
+      </section>
+
+      <ul class="legend" aria-label="Wireflow 图例">
+        <li><span class="legend-mark">点</span>用户主动操作</li>
+        <li><span class="legend-mark">自</span>确定性自动流程</li>
+        <li><span class="legend-mark agent">AI</span>受限 Agent 判断</li>
+        <li><span class="legend-mark">双</span>iPhone／Watch 同步</li>
+      </ul>
+    </header>
+
+    <main class="flow" aria-label="散步中的小花 Wireflow">
+      <section class="stage" aria-labelledby="stage-1-title">
+        <div class="stage-number" aria-hidden="true">01</div>
+        <div class="stage-body">
+          <p class="stage-kicker">App 首页 · 待机微循环</p>
+          <h2 id="stage-1-title">用户先看见正在生活的 zaizai</h2>
+          <p class="stage-lead">全新进入时随机显示清醒坐姿或趴睡；首页的“一起散步”和三个内容入口一直存在。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · App 首页</strong><span>完整基础体验</span></div>
+              <div class="phone" aria-label="iPhone App 首页线框">
+                <div class="phone-screen">
+                  <div class="status-bar"><span>9:41</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>zaizai</span><span>•••</span></div>
+                  <div class="art-stage">
+                    <div class="art-placeholder" id="home-phone-art">占位：zaizai 清醒坐姿</div>
+                    <div class="wire-bubble" id="home-phone-heart">像素爱心泡泡 · 同画面叠加</div>
+                  </div>
+                  <div class="screen-actions">
+                    <div class="screen-action primary">和 zaizai 一起散步</div>
+                  </div>
+                  <div class="book-row" aria-label="首页三个内容入口">
+                    <div class="book-tile">回忆</div>
+                    <div class="book-tile">小收藏</div>
+                    <div class="book-tile">相册</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 首页</strong><span>增强体验</span></div>
+              <div class="watch" aria-label="Apple Watch 首页线框">
+                <div class="watch-screen home-watch-screen">
+                  <div class="status-bar"><span>9:41</span><span>●</span></div>
+                  <div class="art-stage">
+                    <div class="art-placeholder" id="home-watch-art">占位：zaizai 清醒坐姿</div>
+                    <div class="wire-bubble" id="home-watch-heart">像素爱心泡泡 · 同画面叠加</div>
+                  </div>
+                  <div class="screen-action primary small">和 zaizai 一起散步</div>
+                </div>
+              </div>
+
+              <div class="state-control">
+                <strong>查看首页状态</strong>
+                <div class="state-buttons" role="group" aria-label="首页待机状态">
+                  <button class="state-button" type="button" data-home-state="awake" aria-pressed="true">清醒 60%</button>
+                  <button class="state-button" type="button" data-home-state="sleep" aria-pressed="false">趴睡 40%</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="micro-loop" aria-label="首页待机微循环">
+            <div class="micro-node"><strong>清醒坐姿</strong><span>点击反馈后仍清醒，并重启计时</span></div>
+            <div class="micro-node"><strong>15 秒无操作</strong><span>柔和切换为趴睡</span></div>
+            <div class="micro-node"><strong>趴睡观察段</strong><span>每 15–20 秒约 35% 概率自然醒来</span></div>
+          </div>
+
+          <div class="content-branch" aria-label="首页三个内容入口的空状态支线">
+            <h3>首页常驻支线：散步前也可以查看三个内容页</h3>
+            <div class="branch-pages">
+              <div class="branch-page"><strong>“回忆” → “共同回忆”</strong><span>空状态：你们一起经历的事情会留在这里。</span></div>
+              <div class="branch-page"><strong>“小收藏” → “小收藏”</strong><span>空状态：一起带回来的小东西会放在这里。</span></div>
+              <div class="branch-page"><strong>“相册” → “相册”</strong><span>空状态：一起拍下的照片会留在这里。</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-2-title">
+        <div class="stage-number" aria-hidden="true">02</div>
+        <div class="stage-body">
+          <p class="stage-kicker">用户操作 · 开始确认</p>
+          <h2 id="stage-2-title">点击“一起散步”后，先确认再开始</h2>
+          <p class="stage-lead">用户可以从任一设备发起。如果 zaizai 正在睡觉，它先醒来坐好约 0.5 秒；取消不会产生一次很短的 Workout。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 开始确认</strong><span>用户点按</span></div>
+              <div class="phone" aria-label="iPhone 开始散步确认线框">
+                <div class="phone-screen">
+                  <div class="status-bar"><span>9:41</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>取消</span><span>准备散步</span></div>
+                  <div class="art-placeholder">占位：zaizai 已清醒坐好</div>
+                  <h3 class="screen-title">要一起去散步吗？</h3>
+                  <p class="screen-copy">确认后才开始本次散步。</p>
+                  <div class="screen-actions">
+                    <div class="screen-action primary">开始散步</div>
+                    <div class="screen-action">再想想</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 开始确认</strong><span>可独立发起</span></div>
+              <div class="watch" aria-label="Apple Watch 开始散步确认线框">
+                <div class="watch-screen">
+                  <div class="status-bar"><span>9:41</span><span>●</span></div>
+                  <h3 class="screen-title">要一起去散步吗？</h3>
+                  <div class="art-placeholder compact">占位：zaizai 已清醒坐好</div>
+                  <p class="screen-copy">确认后才开始本次散步。</p>
+                  <div class="screen-actions">
+                    <div class="screen-action primary small">开始散步</div>
+                    <div class="screen-action small">再想想</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="flow-note">选择“再想想” → 回到首页并保持清醒；选择“开始散步” → 进入散步进行中。</p>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-3-title">
+        <div class="stage-number" aria-hidden="true">03</div>
+        <div class="stage-body">
+          <p class="stage-kicker">散步进行中 · 前台与幕后</p>
+          <h2 id="stage-3-title">前台只有散步，Agent 在稀疏机会中判断</h2>
+          <p class="stage-lead">页面不显示真实地点、天气、季节或昼夜；当前用 Mock 时长跑通体验。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 散步进行中</strong><span>前台页面</span></div>
+              <div class="phone" aria-label="iPhone 散步进行中线框">
+                <div class="phone-screen walking-phone-screen">
+                  <div class="status-bar"><span>9:43</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>散步中</span><span>00:02:17</span></div>
+                  <div class="art-placeholder">占位：zaizai 穿胸背侧身行走</div>
+                  <p class="screen-copy">本次散步</p>
+                  <h3 class="screen-title">2 分 17 秒</h3>
+                  <div class="screen-actions">
+                    <div class="screen-action">结束散步</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 散步进行中</strong><span>无需拿出手机</span></div>
+              <div class="watch" aria-label="Apple Watch 散步进行中线框">
+                <div class="watch-screen walking-watch-screen">
+                  <div class="status-bar"><span>9:43</span><span>●</span></div>
+                  <div class="art-placeholder">占位：zaizai 穿胸背侧身行走</div>
+                  <h3 class="screen-title">02:17</h3>
+                  <div class="screen-action small">结束散步</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="agent-lane" aria-label="Agent 幕后判断">
+            <div class="agent-node"><strong>1 · 内部检查机会</strong><span>约第 2–3 分钟进入可判断阶段，之后每 45–60 秒一次机会。</span></div>
+            <div class="agent-node"><strong>2 · 结构化 Mock 情境</strong><span>小花候选、忙闲状态、可见提示冷却和散步状态。</span></div>
+            <div class="agent-node agent-result"><strong>3 · LLM 输出</strong><span id="agent-decision">intervene_now · 现在介入</span></div>
+          </div>
+          <p class="flow-note">Agent 只决定是否介入，不替用户选择，不改写故事，也不决定收藏结果。</p>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-4-title">
+        <div class="stage-number" aria-hidden="true">04</div>
+        <div class="stage-body">
+          <p class="stage-kicker">跨端同步 · 小花提示</p>
+          <h2 id="stage-4-title">一次事件，同时抵达 iPhone 与 Watch</h2>
+          <p class="stage-lead" id="prompt-stage-lead">两端显示同一个小花事件；用户在任一端操作后，另一端同步结果。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 小花提示卡</strong><span id="phone-prompt-caption">全幅覆盖散步画面</span></div>
+              <div class="phone" aria-label="iPhone 小花提示线框">
+                <div class="phone-screen">
+                  <div class="status-bar"><span>9:44</span><span>● ◒ ▰</span></div>
+                  <div class="prompt-card is-full" id="phone-prompt-card">
+                    <div class="prompt-visuals" aria-label="提示卡图像占位">
+                      <div class="prompt-icon">zaizai 开心／好奇头像</div>
+                      <div class="prompt-icon">简化小花图形</div>
+                    </div>
+                    <strong>zaizai 发现了一朵小花</strong>
+                    <div class="prompt-options" id="phone-prompt-options">
+                      <button class="prompt-option" type="button" data-prompt-choice="look">去看看</button>
+                      <button class="prompt-option" type="button" data-prompt-choice="wait">等我一下</button>
+                      <button class="prompt-option" type="button" data-prompt-choice="dismiss">继续散步</button>
+                    </div>
+                  </div>
+                  <div id="phone-no-prompt" hidden>
+                    <div class="screen-nav"><span>散步中</span><span>00:02:54</span></div>
+                    <div class="art-placeholder">占位：zaizai 穿胸背侧身行走</div>
+                    <h3 class="screen-title">散步继续</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 小花提示卡</strong><span id="watch-prompt-caption">全幅覆盖散步画面</span></div>
+              <div class="watch" aria-label="Apple Watch 小花提示线框">
+                <div class="watch-screen">
+                  <div class="status-bar"><span>9:44</span><span>●</span></div>
+                  <div class="prompt-card is-full" id="watch-prompt-card">
+                    <div class="prompt-visuals" aria-label="提示卡图像占位">
+                      <div class="prompt-icon">zaizai 开心／好奇头像</div>
+                      <div class="prompt-icon">简化小花图形</div>
+                    </div>
+                    <strong>zaizai 发现了一朵小花</strong>
+                    <div class="prompt-options">
+                      <button class="prompt-option" type="button" data-prompt-choice="look">去看看</button>
+                      <button class="prompt-option" type="button" data-prompt-choice="wait">等我一下</button>
+                      <button class="prompt-option" type="button" data-prompt-choice="dismiss">继续散步</button>
+                    </div>
+                  </div>
+                  <div id="watch-no-prompt" hidden>
+                    <div class="art-placeholder">占位：zaizai 穿胸背侧身行走</div>
+                    <h3 class="screen-title">散步继续</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="flow-note" id="sync-note">本路径选择“去看看”；另一端同步进入小花现场。</p>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-5-title">
+        <div class="stage-number" aria-hidden="true">05</div>
+        <div class="stage-body">
+          <p class="stage-kicker">当前路径 · 事件状态</p>
+          <h2 id="stage-5-title">进入小花现场并作出选择</h2>
+          <p class="stage-lead" id="event-stage-lead">iPhone 与 Watch 使用同一主画面、标题、说明和三个选项；Watch 只减少周边界面元素。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 当前事件页面</strong><span id="event-phone-caption">现场选择</span></div>
+              <div class="phone" aria-label="iPhone 小花事件线框">
+                <div class="phone-screen event-phone-screen">
+                  <div class="status-bar"><span>9:44</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>返回</span><span id="event-nav-title">散步中的小花</span></div>
+                  <div class="pending-banner" id="event-pending-banner" hidden>刚才的小花 · 点击可以重新打开</div>
+                  <div class="art-placeholder" id="event-phone-art">占位：zaizai 闻花主画面</div>
+                  <h3 class="screen-title" id="event-phone-title">我们遇见的小花</h3>
+                  <p class="screen-copy" id="event-phone-copy">你想怎样回应 zaizai 的发现？</p>
+                  <div class="screen-actions" id="event-phone-choices">
+                    <button class="screen-action" type="button" data-event-choice="bring">把它带回家</button>
+                    <button class="screen-action" type="button" data-event-choice="photo">拍张合影</button>
+                    <button class="screen-action" type="button" data-event-choice="pat">拍拍 zaizai 的头</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 当前事件页面</strong><span id="event-watch-caption">同等选择</span></div>
+              <div class="watch" aria-label="Apple Watch 小花事件线框">
+                <div class="watch-screen event-watch-screen">
+                  <div class="status-bar"><span>9:44</span><span>●</span></div>
+                  <div class="pending-banner" id="watch-pending-banner" hidden>刚才的小花</div>
+                  <div class="art-placeholder" id="event-watch-art">占位：zaizai 闻花主画面</div>
+                  <h3 class="screen-title" id="event-watch-title">我们遇见的小花</h3>
+                  <p class="screen-copy" id="event-watch-copy">你想怎样回应 zaizai 的发现？</p>
+                  <div class="screen-actions" id="event-watch-choices">
+                    <button class="screen-action small" type="button" data-event-choice="bring">把它带回家</button>
+                    <button class="screen-action small" type="button" data-event-choice="photo">拍张合影</button>
+                    <button class="screen-action small" type="button" data-event-choice="pat">拍拍 zaizai 的头</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="flow-note">三个选项都已经连接：点击 iPhone 或 Watch 中的任一选项，会切换整条 Wireflow；当前选择会高亮，下方现场结果以及 06–08 的后续状态会一起更新。</p>
+
+          <div class="result-panel">
+            <div class="art-placeholder" id="result-art">占位：带花回家的即时结果</div>
+            <div>
+              <h3 id="result-title">本路径结果：把它带回家</h3>
+              <p id="result-copy">显示“你把这朵和 zaizai 一起发现的小花带回了家。”共同回忆立即写入；书签在散步结束时生成。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-6-title">
+        <div class="stage-number" aria-hidden="true">06</div>
+        <div class="stage-body">
+          <p class="stage-kicker">返回散步 · 结束确认</p>
+          <h2 id="stage-6-title">事件结束后回到散步；结束仍需确认</h2>
+          <p class="stage-lead" id="end-stage-lead">完成现场分支后自动返回，不要求用户再点一次“继续散步”。</p>
+
+          <div class="transition-strip" aria-label="事件结果到散步结束的过渡">
+            <div class="transition-node"><strong id="transition-1-title">专属结果</strong><span id="transition-1-copy">约 3 秒</span></div>
+            <div class="transition-node"><strong id="transition-2-title">“然后，你们继续散步了”</strong><span id="transition-2-copy">侧身行走图约 1.5 秒</span></div>
+            <div class="transition-node"><strong id="transition-3-title">散步进行中</strong><span id="transition-3-copy">自动返回</span></div>
+          </div>
+
+          <div class="device-grid after-transition">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 结束确认</strong><span>防止误触</span></div>
+              <div class="phone" aria-label="iPhone 结束散步确认线框">
+                <div class="phone-screen end-phone-screen">
+                  <div class="status-bar"><span>9:47</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>散步中</span><span>00:05:03</span></div>
+                  <div class="pending-banner" id="end-phone-pending" hidden>刚才的小花 · 尚未处理</div>
+                  <div class="art-placeholder">占位：继续行走的 zaizai</div>
+                  <div class="screen-modal">
+                    <strong>要结束散步吗？</strong>
+                    <p class="screen-copy">确认后才结束本次散步／Workout。</p>
+                    <div class="screen-actions">
+                      <div class="screen-action primary small">结束散步</div>
+                      <div class="screen-action small">继续走走</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 结束确认</strong><span>同样需要确认</span></div>
+              <div class="watch" aria-label="Apple Watch 结束散步确认线框">
+                <div class="watch-screen">
+                  <div class="status-bar"><span>9:47</span><span>●</span></div>
+                  <div class="pending-banner" id="end-watch-pending" hidden>刚才的小花</div>
+                  <h3 class="screen-title">要结束散步吗？</h3>
+                  <div class="screen-actions">
+                    <div class="screen-action primary small">结束散步</div>
+                    <div class="screen-action small">继续走走</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-7-title">
+        <div class="stage-number" aria-hidden="true">07</div>
+        <div class="stage-body">
+          <p class="stage-kicker">散步总结 · 条件内容</p>
+          <h2 id="stage-7-title">只展示真正发生的结果</h2>
+          <p class="stage-lead">总结始终向下扩展；没有获得的内容不显示空槽位，也不暗示用户错过了什么。</p>
+
+          <div class="device-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 散步总结</strong><span>固定模板 + 条件内容</span></div>
+              <div class="phone" aria-label="iPhone 散步总结线框">
+                <div class="phone-screen summary-phone-screen">
+                  <div class="status-bar"><span>9:47</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span></span><span>散步完成</span></div>
+                  <div class="art-placeholder">占位：zaizai 开心满足</div>
+                  <h3 class="screen-title">今天也一起走了一会儿</h3>
+                  <p class="screen-copy">本次散步 · 5 分 03 秒</p>
+                  <div class="summary-extra" id="phone-summary-extra">
+                    <strong id="phone-summary-title">获得花朵书签</strong><br>
+                    <span id="phone-summary-copy">展示书签与收进“小收藏”的简短动效；提示回到首页后查看。</span>
+                  </div>
+                  <div class="screen-action primary">回到首页</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column">
+              <div class="device-heading"><strong>Apple Watch · 简化总结</strong><span>不承担完整浏览</span></div>
+              <div class="watch" aria-label="Apple Watch 散步总结线框">
+                <div class="watch-screen">
+                  <div class="status-bar"><span>9:47</span><span>●</span></div>
+                  <h3 class="screen-title">散步完成</h3>
+                  <p class="screen-copy">5:03 · zaizai 很开心</p>
+                  <div class="summary-extra" id="watch-summary-extra">已获得花朵书签</div>
+                  <p class="screen-copy">完整内容回到 iPhone App 查看。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stage" aria-labelledby="stage-8-title">
+        <div class="stage-number" aria-hidden="true">08</div>
+        <div class="stage-body">
+          <p class="stage-kicker">回到首页 · 内容回看</p>
+          <h2 id="stage-8-title">新增内容通过首页入口被看见</h2>
+          <p class="stage-lead">zaizai 回家后保持清醒愉快 2 分钟；只有真正更新的入口出现柔和高光，用户再主动打开内容。</p>
+
+          <div class="device-grid two-phone" id="return-home-grid">
+            <div class="device-column">
+              <div class="device-heading"><strong>iPhone · 回到首页</strong><span>先回家，再查看</span></div>
+              <div class="phone" aria-label="iPhone 回到首页线框">
+                <div class="phone-screen">
+                  <div class="status-bar"><span>9:48</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>zaizai</span><span>•••</span></div>
+                  <div class="art-placeholder">占位：散步后清醒愉快的 zaizai</div>
+                  <div class="screen-action primary">和 zaizai 一起散步</div>
+                  <div class="book-row">
+                    <div class="book-tile" data-book="memory">回忆</div>
+                    <div class="book-tile" data-book="collection">小收藏</div>
+                    <div class="book-tile" data-book="album">相册</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="device-column" id="content-device-column">
+              <div class="device-heading"><strong>iPhone · 打开已更新入口</strong><span id="content-caption">共同回忆</span></div>
+              <div class="phone" aria-label="iPhone 新增内容页面线框">
+                <div class="phone-screen">
+                  <div class="status-bar"><span>9:48</span><span>● ◒ ▰</span></div>
+                  <div class="screen-nav"><span>返回</span><span id="content-nav">共同回忆</span></div>
+                  <h3 class="screen-title" id="content-title">共同回忆</h3>
+                  <ul class="content-list" id="content-list"></ul>
+                </div>
+              </div>
+
+              <div class="state-control" id="content-target-control">
+                <strong>切换查看本路径更新的入口</strong>
+                <div class="state-buttons" id="content-target-buttons" role="group" aria-label="本路径更新的内容入口"></div>
+              </div>
+            </div>
+          </div>
+          <p class="flow-note" id="home-outcome">回忆与小收藏出现柔和高光；用户从首页主动打开对应页面。点击条目后可继续进入回忆详情、书签放大页或单张照片页。</p>
+        </div>
+      </section>
+    </main>
+
+    <p class="final-note">Wireflow V0.6 是页面结构与状态连接的审阅基线，不是锁定稿，也不是最终视觉稿。后续发现问题时，可以继续反向修改文字流程与体验设计。</p>
+  </div>
+
+  <script>
+    const routes = {
+      bring: {
+        current: "当前路径：Agent 介入 → 去看看 → 把花带回家 → 继续散步 → 获得共同回忆与花朵书签。",
+        decision: "intervene_now · 现在介入",
+        promptVisible: true,
+        promptChoice: "look",
+        syncNote: "本路径选择“去看看”；任一端完成选择后，另一端同步进入小花现场。",
+        stageTitle: "进入小花现场并选择把它带回家",
+        stageLead: "iPhone 与 Watch 使用同一主画面、标题、说明和三个选项；Watch 只减少周边界面元素。",
+        phoneCaption: "现场选择",
+        watchCaption: "同等选择",
+        navTitle: "散步中的小花",
+        phoneArt: "占位：zaizai 闻花主画面",
+        watchArt: "占位：zaizai 闻花",
+        phoneTitle: "我们遇见的小花",
+        phoneCopy: "你想怎样回应 zaizai 的发现？",
+        watchTitle: "选一个回应",
+        watchCopy: "",
+        eventChoice: "bring",
+        pending: false,
+        resultArt: "占位：带花回家的即时结果",
+        resultTitle: "本路径结果：把它带回家",
+        resultCopy: "显示“你把这朵和 zaizai 一起发现的小花带回了家。”共同回忆立即写入；书签在散步结束时生成。",
+        endLead: "完成现场分支后自动返回，不要求用户再点一次“继续散步”。",
+        transition: [
+          ["专属结果", "约 3 秒"],
+          ["“然后，你们继续散步了”", "侧身行走图约 1.5 秒"],
+          ["散步进行中", "自动返回"]
+        ],
+        summaryVisible: true,
+        summaryTitle: "获得花朵书签",
+        summaryCopy: "展示书签与收进“小收藏”的简短动效；提示回到首页后查看。",
+        watchSummary: "已获得花朵书签",
+        updatedBooks: ["memory", "collection"],
+        contentCaption: "共同回忆／小收藏",
+        contentNav: "本次新增",
+        contentTitle: "散步中的小花",
+        contentItems: [
+          ["共同回忆", "闻花主图 · 我们遇见的小花 · 低机位 zaizai 视角 · 书签尾声"],
+          ["小收藏", "新增：花朵书签"]
+        ],
+        homeOutcome: "回忆与小收藏出现柔和高光；Watch 只提示获得书签，完整查看留在 iPhone。"
+      },
+      photo: {
+        current: "当前路径：Agent 介入 → 去看看 → 拍张合影 → 继续散步 → 获得共同回忆与相册照片。",
+        decision: "intervene_now · 现在介入",
+        promptVisible: true,
+        promptChoice: "look",
+        syncNote: "本路径选择“去看看”；任一端完成选择后，另一端同步进入小花现场。",
+        stageTitle: "进入小花现场并选择拍张合影",
+        stageLead: "iPhone 与 Watch 使用同一主画面、标题、说明和三个选项；Watch 只减少周边界面元素。",
+        phoneCaption: "现场选择",
+        watchCaption: "同等选择",
+        navTitle: "散步中的小花",
+        phoneArt: "占位：zaizai 闻花主画面",
+        watchArt: "占位：zaizai 闻花",
+        phoneTitle: "我们遇见的小花",
+        phoneCopy: "你想怎样回应 zaizai 的发现？",
+        watchTitle: "选一个回应",
+        watchCopy: "",
+        eventChoice: "photo",
+        pending: false,
+        resultArt: "占位：带拍立得／相纸边缘的合影",
+        resultTitle: "本路径结果：拍张合影",
+        resultCopy: "预制合影当场出现并写入相册；“散步中的小花”同时写入共同回忆。",
+        endLead: "合影短结果结束后自动返回散步，不增加“继续散步”按钮。",
+        transition: [
+          ["合影出现", "约 3 秒"],
+          ["“然后，你们继续散步了”", "侧身行走图约 1.5 秒"],
+          ["散步进行中", "自动返回"]
+        ],
+        summaryVisible: true,
+        summaryTitle: "新合影进入相册",
+        summaryCopy: "再次展示实体相纸感合影与收纳动效；提示回到首页后查看。",
+        watchSummary: "新照片已经保存",
+        updatedBooks: ["memory", "album"],
+        contentCaption: "共同回忆／相册",
+        contentNav: "本次新增",
+        contentTitle: "散步中的小花",
+        contentItems: [
+          ["共同回忆", "闻花主图 · 我们遇见的小花 · 低机位 zaizai 视角 · 合影尾声"],
+          ["相册", "新增：zaizai 与小花的合影 · 显示日期"]
+        ],
+        homeOutcome: "回忆与相册出现柔和高光；Watch 提示照片已保存，完整查看留在 iPhone。"
+      },
+      pat: {
+        current: "当前路径：Agent 介入 → 去看看 → 拍拍 zaizai → 继续散步 → 获得带专属尾声的共同回忆。",
+        decision: "intervene_now · 现在介入",
+        promptVisible: true,
+        promptChoice: "look",
+        syncNote: "本路径选择“去看看”；任一端完成选择后，另一端同步进入小花现场。",
+        stageTitle: "进入小花现场并选择拍拍 zaizai",
+        stageLead: "iPhone 与 Watch 使用同一主画面、标题、说明和三个选项；Watch 只减少周边界面元素。",
+        phoneCaption: "现场选择",
+        watchCaption: "同等选择",
+        navTitle: "散步中的小花",
+        phoneArt: "占位：zaizai 闻花主画面",
+        watchArt: "占位：zaizai 闻花",
+        phoneTitle: "我们遇见的小花",
+        phoneCopy: "你想怎样回应 zaizai 的发现？",
+        watchTitle: "选一个回应",
+        watchCopy: "",
+        eventChoice: "pat",
+        pending: false,
+        resultArt: "占位：手轻摸 zaizai，zaizai 开心蹭蹭",
+        resultTitle: "本路径结果：拍拍 zaizai 的头",
+        resultCopy: "蹭蹭手的画面成为共同回忆的专属最后一张图；不生成书签或相册照片。",
+        endLead: "蹭蹭手短动效结束后自动返回散步，不让偏爱互动的用户少得到一段体验。",
+        transition: [
+          ["蹭蹭手短动效", "约 3 秒"],
+          ["“然后，你们继续散步了”", "侧身行走图约 1.5 秒"],
+          ["散步进行中", "自动返回"]
+        ],
+        summaryVisible: true,
+        summaryTitle: "这段互动进入共同回忆",
+        summaryCopy: "总结确认经历已经留下，其中包含 zaizai 蹭蹭用户手的专属尾声。",
+        watchSummary: "这段经历已经留下",
+        updatedBooks: ["memory"],
+        contentCaption: "共同回忆",
+        contentNav: "共同回忆",
+        contentTitle: "散步中的小花",
+        contentItems: [
+          ["共同回忆", "闻花主图 · 我们遇见的小花 · 低机位 zaizai 视角 · 蹭蹭手尾声"]
+        ],
+        homeOutcome: "只有回忆出现柔和高光；本路径不产生书签或相册照片。"
+      },
+      wait: {
+        current: "当前路径：Agent 介入 → 等我一下（或 1 分钟无回应）→ 保留“刚才的小花” → 散步结束时自动呈现。",
+        decision: "intervene_now · 现在介入",
+        promptVisible: true,
+        promptChoice: "wait",
+        syncNote: "本路径选择“等我一下”；1 分钟没有回应也进入相同的待处理状态，两端同步保留 Banner。",
+        stageTitle: "小花变成可以稍后打开的轻量 Banner",
+        stageLead: "zaizai 继续正常行走，不蹲在花旁，也不再次催促。",
+        phoneCaption: "待处理 Banner",
+        watchCaption: "同步待处理",
+        navTitle: "散步中",
+        phoneArt: "占位：正常行走的 zaizai",
+        watchArt: "占位：正常行走",
+        phoneTitle: "刚才的小花",
+        phoneCopy: "Banner 位于散步页上方，有足够点击高度；点击后重新打开三个选择。",
+        watchTitle: "刚才的小花",
+        watchCopy: "不再次震动或主动弹出。",
+        eventChoice: null,
+        pending: true,
+        resultArt: "占位：散步页顶部“刚才的小花” Banner",
+        resultTitle: "本路径状态：留到稍后",
+        resultCopy: "再次选择“等我一下”或关闭选择层会继续保留；本路径一直不处理，直到结束散步。",
+        endLead: "结束确认时仍保留待处理小花；选择“继续走走”会回到带 Banner 的散步页。",
+        transition: [
+          ["Banner 保留", "不再次提醒"],
+          ["用户结束散步", "进入结束确认"],
+          ["确认结束", "总结中自动呈现"]
+        ],
+        summaryVisible: true,
+        summaryTitle: "今天 zaizai 在路上发现了一朵小花",
+        summaryCopy: "不再询问是否查看；显示低机位“zaizai 眼里的小花”，写入特殊版本共同回忆。",
+        watchSummary: "zaizai 发现的小花已经留下",
+        updatedBooks: ["memory"],
+        contentCaption: "共同回忆",
+        contentNav: "共同回忆",
+        contentTitle: "散步中的小花 · 特殊版本",
+        contentItems: [
+          ["共同回忆", "闻花主图 · 低机位“zaizai 眼里的小花” · 无空槽位"]
+        ],
+        homeOutcome: "只有回忆出现柔和高光；没有“我们遇见的小花”、书签或合影。"
+      },
+      dismiss: {
+        current: "当前路径：Agent 介入 → 用户选择继续散步 → 小花事件安静结束 → 普通散步总结。",
+        decision: "intervene_now · 现在介入",
+        promptVisible: true,
+        promptChoice: "dismiss",
+        syncNote: "本路径选择“继续散步”；从待处理状态向上滑走 Banner 也得到相同结果。",
+        stageTitle: "小花事件安静结束，用户继续散步",
+        stageLead: "zaizai 不委屈、不再次提示，也不会形成负面偏好。",
+        phoneCaption: "恢复散步页面",
+        watchCaption: "提示同步收起",
+        navTitle: "散步中",
+        phoneArt: "占位：正常行走的 zaizai",
+        watchArt: "占位：正常行走",
+        phoneTitle: "继续散步",
+        phoneCopy: "页面立即回到正常散步状态。",
+        watchTitle: "继续散步",
+        watchCopy: "本次小花事件已结束。",
+        eventChoice: null,
+        pending: false,
+        resultArt: "占位：普通散步页面",
+        resultTitle: "本路径结果：不写入内容",
+        resultCopy: "不写入共同回忆、小收藏或相册；以后其他散步仍可能出现小花。",
+        endLead: "用户继续普通散步，准备结束时仍经过同一个结束确认。",
+        transition: [
+          ["事件收起", "不产生关系变化"],
+          ["继续散步", "无待处理 Banner"],
+          ["用户结束散步", "进入结束确认"]
+        ],
+        summaryVisible: false,
+        summaryTitle: "",
+        summaryCopy: "",
+        watchSummary: "只显示基础散步总结",
+        updatedBooks: [],
+        contentCaption: "没有新增内容",
+        contentNav: "三个内容入口",
+        contentTitle: "保持原有内容",
+        contentItems: [],
+        homeOutcome: "三个入口都没有新高光；页面不暗示用户拒绝或错过了什么。"
+      },
+      silent: {
+        current: "当前路径：内部判断保持安静 → 用户从未收到小花提示 → 普通散步总结。",
+        decision: "stay_silent · 暂不介入",
+        promptVisible: false,
+        promptChoice: null,
+        syncNote: "用户在两端都看不到提示、触觉或空栏目；候选事件只可能在下一次稀疏机会中重新判断。",
+        stageTitle: "用户没有进入任何小花页面",
+        stageLead: "Agent 的内部判断不会自动变成待处理事件；用户始终只看到正常散步页面。",
+        phoneCaption: "正常散步页面",
+        watchCaption: "正常散步页面",
+        navTitle: "散步中",
+        phoneArt: "占位：正常行走的 zaizai",
+        watchArt: "占位：正常行走",
+        phoneTitle: "散步继续",
+        phoneCopy: "没有 Banner、提示或用户选择。",
+        watchTitle: "散步继续",
+        watchCopy: "没有触觉或提示卡。",
+        eventChoice: null,
+        pending: false,
+        resultArt: "占位：普通散步页面",
+        resultTitle: "本路径状态：没有前台事件",
+        resultCopy: "如果直到散步结束都不介入，小花候选随本次散步结束，不写入内容。",
+        endLead: "用户按普通路径结束散步；内部未出现过的候选事件不会进入总结。",
+        transition: [
+          ["下一次内部机会", "仍可再次判断"],
+          ["用户继续散步", "界面不变化"],
+          ["用户结束散步", "进入结束确认"]
+        ],
+        summaryVisible: false,
+        summaryTitle: "",
+        summaryCopy: "",
+        watchSummary: "只显示基础散步总结",
+        updatedBooks: [],
+        contentCaption: "没有新增内容",
+        contentNav: "三个内容入口",
+        contentTitle: "保持原有内容",
+        contentItems: [],
+        homeOutcome: "三个入口都没有新高光；用户不知道有一个未出现的小花候选。"
+      }
+    };
+
+    const routeButtons = Array.from(document.querySelectorAll("[data-route]"));
+    const promptChoices = Array.from(document.querySelectorAll("[data-prompt-choice]"));
+    const eventChoices = Array.from(document.querySelectorAll("[data-event-choice]"));
+    const bookTiles = Array.from(document.querySelectorAll("[data-book]"));
+    const contentViews = {
+      memory: {
+        label: "回忆",
+        nav: "共同回忆",
+        title: "共同回忆",
+        items: (routeName) => [[
+          "散步中的小花",
+          routeName === "wait"
+            ? "发生日期 · 特殊版本：闻花主图与低机位“zaizai 眼里的小花”"
+            : "发生日期 · 以 zaizai 闻花主图为缩略图 · 点击查看详情"
+        ]]
+      },
+      collection: {
+        label: "小收藏",
+        nav: "小收藏",
+        title: "小收藏",
+        items: () => [["花朵书签", "两列收藏格 · 点击查看放大的书签"]]
+      },
+      album: {
+        label: "相册",
+        nav: "相册",
+        title: "相册",
+        items: () => [["zaizai 与小花的合影", "两列照片网格 · 显示日期 · 点击查看单张照片"]]
+      }
+    };
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function renderContentView(target, routeName) {
+      const view = contentViews[target];
+      if (!view) return;
+
+      setText("content-caption", view.label);
+      setText("content-nav", view.nav);
+      setText("content-title", view.title);
+
+      document.querySelectorAll("[data-content-target]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.contentTarget === target));
+      });
+
+      const list = document.getElementById("content-list");
+      list.replaceChildren(...view.items(routeName).map(([title, copy]) => {
+        const item = document.createElement("li");
+        item.className = "content-item";
+        const strong = document.createElement("strong");
+        strong.textContent = title;
+        const span = document.createElement("span");
+        span.textContent = copy;
+        item.append(strong, span);
+        return item;
+      }));
+    }
+
+    function setRoute(name) {
+      const route = routes[name];
+      if (!route) return;
+
+      routeButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.route === name));
+      });
+
+      setText("current-route", route.current);
+      setText("agent-decision", route.decision);
+      document.querySelector(".agent-result").classList.toggle("is-silent", !route.promptVisible);
+
+      document.getElementById("phone-prompt-card").hidden = !route.promptVisible;
+      document.getElementById("phone-prompt-options").hidden = !route.promptVisible;
+      document.getElementById("watch-prompt-card").hidden = !route.promptVisible;
+      document.getElementById("phone-no-prompt").hidden = route.promptVisible;
+      document.getElementById("watch-no-prompt").hidden = route.promptVisible;
+      setText("phone-prompt-caption", route.promptVisible ? "全幅覆盖散步画面" : "保持正常散步");
+      setText("watch-prompt-caption", route.promptVisible ? "全幅覆盖散步画面" : "保持正常散步");
+      setText("prompt-stage-lead", route.promptVisible
+        ? "两端显示同一个小花事件；用户在任一端操作后，另一端同步结果。"
+        : "Agent 选择保持安静；iPhone 与 Watch 都维持普通散步状态。");
+      setText("sync-note", route.syncNote);
+
+      promptChoices.forEach((choice) => {
+        choice.classList.toggle("is-selected", choice.dataset.promptChoice === route.promptChoice);
+      });
+
+      setText("stage-5-title", route.stageTitle);
+      const hasEventChoices = route.eventChoice !== null;
+      const eventCaption = hasEventChoices ? "同一现场与选择" : route.phoneCaption;
+      setText("event-stage-lead", route.stageLead);
+      setText("event-phone-caption", eventCaption);
+      setText("event-watch-caption", eventCaption);
+      setText("event-nav-title", route.navTitle);
+      setText("event-phone-art", route.phoneArt);
+      setText("event-watch-art", route.phoneArt);
+      setText("event-phone-title", route.phoneTitle);
+      setText("event-phone-copy", route.phoneCopy);
+      setText("event-watch-title", route.phoneTitle);
+      setText("event-watch-copy", route.phoneCopy);
+      document.getElementById("event-pending-banner").hidden = !route.pending;
+      document.getElementById("watch-pending-banner").hidden = !route.pending;
+      document.getElementById("event-phone-choices").hidden = !hasEventChoices;
+      document.getElementById("event-watch-choices").hidden = !hasEventChoices;
+
+      eventChoices.forEach((choice) => {
+        choice.classList.toggle("is-selected", choice.dataset.eventChoice === route.eventChoice);
+      });
+
+      setText("result-art", route.resultArt);
+      setText("result-title", route.resultTitle);
+      setText("result-copy", route.resultCopy);
+      setText("end-stage-lead", route.endLead);
+      route.transition.forEach((item, index) => {
+        setText(`transition-${index + 1}-title`, item[0]);
+        setText(`transition-${index + 1}-copy`, item[1]);
+      });
+      document.getElementById("end-phone-pending").hidden = !route.pending;
+      document.getElementById("end-watch-pending").hidden = !route.pending;
+
+      document.getElementById("phone-summary-extra").hidden = !route.summaryVisible;
+      document.getElementById("watch-summary-extra").hidden = !route.summaryVisible;
+      setText("phone-summary-title", route.summaryTitle);
+      setText("phone-summary-copy", route.summaryCopy);
+      setText("watch-summary-extra", route.watchSummary);
+
+      bookTiles.forEach((book) => {
+        book.classList.toggle("is-updated", route.updatedBooks.includes(book.dataset.book));
+      });
+
+      const contentDevice = document.getElementById("content-device-column");
+      const returnHomeGrid = document.getElementById("return-home-grid");
+      const contentTargetControl = document.getElementById("content-target-control");
+      const contentTargetButtons = document.getElementById("content-target-buttons");
+      const contentTargets = route.updatedBooks;
+      const hasUpdatedContent = contentTargets.length > 0;
+
+      contentDevice.hidden = !hasUpdatedContent;
+      returnHomeGrid.classList.toggle("is-single", !hasUpdatedContent);
+      contentTargetControl.hidden = contentTargets.length <= 1;
+      contentTargetButtons.replaceChildren(...contentTargets.map((target) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "state-button";
+        button.dataset.contentTarget = target;
+        button.setAttribute("aria-pressed", "false");
+        button.textContent = contentViews[target].label;
+        button.addEventListener("click", () => renderContentView(target, name));
+        return button;
+      }));
+
+      if (hasUpdatedContent) {
+        renderContentView(contentTargets[0], name);
+      } else {
+        document.getElementById("content-list").replaceChildren();
+      }
+      setText("home-outcome", route.homeOutcome);
+    }
+
+    const homeStateButtons = Array.from(document.querySelectorAll("[data-home-state]"));
+
+    function setHomeState(state) {
+      const sleeping = state === "sleep";
+      homeStateButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.homeState === state));
+      });
+      const sharedArtDescription = sleeping
+        ? "占位：zaizai 趴睡\n呼吸 · 像素梦境泡泡"
+        : "占位：zaizai 清醒坐姿\n呼吸 · 眨眼 · 摆尾 · 偶尔歪头";
+      setText("home-phone-art", sharedArtDescription);
+      setText("home-watch-art", sharedArtDescription);
+      document.getElementById("home-phone-heart").hidden = sleeping;
+      document.getElementById("home-watch-heart").hidden = sleeping;
+    }
+
+    routeButtons.forEach((button) => {
+      button.addEventListener("click", () => setRoute(button.dataset.route));
+    });
+
+    promptChoices.forEach((choice) => {
+      choice.addEventListener("click", () => {
+        const routeName = choice.dataset.promptChoice === "look"
+          ? "bring"
+          : choice.dataset.promptChoice;
+        setRoute(routeName);
+      });
+    });
+
+    eventChoices.forEach((choice) => {
+      choice.addEventListener("click", () => setRoute(choice.dataset.eventChoice));
+    });
+
+    homeStateButtons.forEach((button) => {
+      button.addEventListener("click", () => setHomeState(button.dataset.homeState));
+    });
+
+    setHomeState("awake");
+    setRoute("bring");
+  </script>
+</body>
+</html>

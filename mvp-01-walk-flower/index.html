@@ -80,6 +80,30 @@
       padding: 56px 0 88px;
     }
 
+    .view-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 24px;
+    }
+
+    .view-switch a {
+      padding: 7px 12px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .view-switch a[aria-current="page"] {
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
     .eyebrow {
       margin: 0 0 10px;
       color: var(--accent);
@@ -611,6 +635,11 @@
 <body>
   <div class="page" id="zaizai-user-flow">
     <header>
+      <nav class="view-switch" aria-label="项目页面">
+        <a href="../">产品总览</a>
+        <a href="./" aria-current="page">用户流程</a>
+        <a href="wireflow/">界面流程图 Wireflow</a>
+      </nav>
       <p class="eyebrow">zaizai: Pet Agent · MVP 01 · Living Review V0.2</p>
       <h1>「散步中的小花」<span class="title-line">Agentic MVP <span class="title-tail">端到端体验</span></span></h1>
       <p class="lede">zaizai 的第一个可体验 MVP：用户从 App 首页与它一起开始散步；受限 LLM Agent 只判断“小花事件此刻是否应该介入”，故事选择与回忆写入仍由确定性产品流程完成。</p>
