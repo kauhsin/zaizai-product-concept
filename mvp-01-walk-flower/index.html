@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zaizai: Pet Agent · MVP 01「散步中的小花」端到端体验 V0.2</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page-bg: #f6f4ef;
+      --surface: #fffdfa;
+      --surface-soft: #f0ede6;
+      --text: #22211f;
+      --muted: #68645d;
+      --line: #cbc5b9;
+      --border: #d9d3c7;
+      --accent: #5c5a93;
+      --accent-soft: #eceafa;
+      --accent-text: #393765;
+      --agent: #9a642c;
+      --agent-soft: #f7eadb;
+      --success: #3f755c;
+      --success-soft: #e5f1ea;
+      --shadow: 0 14px 38px rgba(44, 40, 32, 0.08);
+      --focus: #315fbb;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page-bg: #171715;
+        --surface: #22221f;
+        --surface-soft: #2b2a26;
+        --text: #f1eee7;
+        --muted: #b7b1a7;
+        --line: #57534c;
+        --border: #46433d;
+        --accent: #aaa6ef;
+        --accent-soft: #353351;
+        --accent-text: #efedff;
+        --agent: #e1a568;
+        --agent-soft: #493722;
+        --success: #8ac7a7;
+        --success-soft: #263e32;
+        --shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+        --focus: #8cb2ff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 18px;
+      line-height: 1.65;
+    }
+
+    button,
+    summary {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .page {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 56px 0 88px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin-bottom: 12px;
+      font-size: clamp(32px, 5vw, 50px);
+      line-height: 1.18;
+      letter-spacing: -0.035em;
+    }
+
+    .title-line {
+      display: block;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 19px;
+    }
+
+    .case-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin: 32px 0 42px;
+      padding: 20px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .case-summary div {
+      min-width: 0;
+    }
+
+    .case-summary dt {
+      margin-bottom: 3px;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .case-summary dd {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .route-panel {
+      margin-bottom: 54px;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .route-panel h2 {
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+
+    .route-help {
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .route-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .route-button {
+      min-height: 46px;
+      padding: 9px 15px;
+      color: var(--text);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .route-button:hover {
+      border-color: var(--accent);
+    }
+
+    .route-button[aria-pressed="true"] {
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .route-current {
+      margin: 18px 0 0;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 17px;
+    }
+
+    .flow {
+      position: relative;
+    }
+
+    .flow-step {
+      position: relative;
+      padding: 0 0 46px 84px;
+    }
+
+    .flow-step::before {
+      content: "";
+      position: absolute;
+      top: 58px;
+      bottom: -2px;
+      left: 28px;
+      width: 2px;
+      background: var(--line);
+    }
+
+    .flow-step:last-child::before {
+      display: none;
+    }
+
+    .step-number {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: grid;
+      width: 58px;
+      height: 58px;
+      place-items: center;
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .step-body {
+      padding: 28px 30px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .step-kicker {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .step-body h2 {
+      margin-bottom: 8px;
+      font-size: 27px;
+      line-height: 1.3;
+    }
+
+    .step-lead {
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .sequence {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .sequence-item,
+    .device,
+    .outcome-box,
+    .summary-base {
+      padding: 16px;
+      background: var(--surface-soft);
+      border-radius: 14px;
+    }
+
+    .sequence-item strong,
+    .device strong,
+    .outcome-box strong,
+    .summary-base strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 17px;
+    }
+
+    .sequence-item span,
+    .device span,
+    .outcome-box span,
+    .summary-base span {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .inline-return {
+      margin: 18px 0 0;
+      padding-left: 16px;
+      color: var(--muted);
+      border-left: 3px solid var(--line);
+      font-size: 16px;
+    }
+
+    .agent-outcome {
+      margin: 18px 0;
+      padding: 18px 20px;
+      background: var(--agent-soft);
+      border-left: 5px solid var(--agent);
+      border-radius: 0 14px 14px 0;
+    }
+
+    .agent-outcome strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--agent);
+      font-size: 19px;
+    }
+
+    details {
+      margin-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    summary {
+      min-height: 48px;
+      padding: 14px 2px 4px;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .agent-rules {
+      display: grid;
+      gap: 10px;
+      margin: 14px 0 4px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .agent-rules li {
+      position: relative;
+      padding: 12px 14px 12px 42px;
+      background: var(--surface-soft);
+      border-radius: 12px;
+    }
+
+    .agent-rules li::before {
+      content: attr(data-order);
+      position: absolute;
+      top: 12px;
+      left: 13px;
+      color: var(--agent);
+      font-weight: 800;
+    }
+
+    .device-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .device {
+      border-top: 4px solid var(--accent);
+    }
+
+    .selected-action {
+      margin-top: 16px;
+      padding: 18px 20px;
+      color: var(--accent-text);
+      background: var(--accent-soft);
+      border-radius: 14px;
+    }
+
+    .selected-action strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 19px;
+    }
+
+    .outcome-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .outcome-list li {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .outcome-list li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .closing-sequence {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .closing-sequence .arrow {
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    .end-confirmation {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .end-confirmation h3 {
+      margin-bottom: 8px;
+      font-size: 19px;
+    }
+
+    .summary-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-extra {
+      padding: 18px;
+      background: var(--success-soft);
+      border-left: 5px solid var(--success);
+      border-radius: 0 14px 14px 0;
+    }
+
+    .summary-extra strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--success);
+      font-size: 19px;
+    }
+
+    .watch-note {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .books {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .book {
+      min-height: 94px;
+      padding: 16px;
+      background: var(--surface-soft);
+      border: 2px solid transparent;
+      border-radius: 14px;
+    }
+
+    .book strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .book span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .book.is-updated {
+      background: var(--success-soft);
+      border-color: var(--success);
+    }
+
+    .book.is-updated span {
+      color: var(--text);
+    }
+
+    .living-note {
+      margin: 8px 0 0 84px;
+      padding: 20px 24px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      border-radius: 16px;
+      font-size: 16px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        font-size: 17px;
+      }
+
+      .page {
+        width: min(100% - 24px, 1040px);
+        padding-top: 32px;
+      }
+
+      .route-panel,
+      .step-body {
+        padding: 20px;
+        border-radius: 16px;
+      }
+
+      .flow-step {
+        padding-left: 64px;
+      }
+
+      .flow-step::before {
+        left: 23px;
+        top: 48px;
+      }
+
+      .step-number {
+        width: 48px;
+        height: 48px;
+        font-size: 14px;
+      }
+
+      .step-body h2 {
+        font-size: 23px;
+      }
+
+      .sequence,
+      .device-row,
+      .books,
+      .case-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .case-summary {
+        gap: 16px;
+      }
+
+      .closing-sequence {
+        grid-template-columns: 1fr;
+      }
+
+      .closing-sequence .arrow {
+        transform: rotate(90deg);
+        text-align: center;
+      }
+
+      .living-note {
+        margin-left: 64px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .page {
+        width: min(100% - 18px, 1040px);
+      }
+
+      .flow-step {
+        padding: 0 0 34px;
+      }
+
+      .flow-step::before {
+        left: 23px;
+        top: 48px;
+        bottom: -2px;
+      }
+
+      .step-number {
+        position: relative;
+        margin-bottom: 10px;
+      }
+
+      .step-body {
+        position: relative;
+        margin-left: 0;
+      }
+
+      .flow-step::before {
+        display: none;
+      }
+
+      .living-note {
+        margin-left: 0;
+      }
+
+      .title-tail {
+        display: block;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="zaizai-user-flow">
+    <header>
+      <p class="eyebrow">zaizai: Pet Agent · MVP 01 · Living Review V0.2</p>
+      <h1>「散步中的小花」<span class="title-line">Agentic MVP <span class="title-tail">端到端体验</span></span></h1>
+      <p class="lede">zaizai 的第一个可体验 MVP：用户从 App 首页与它一起开始散步；受限 LLM Agent 只判断“小花事件此刻是否应该介入”，故事选择与回忆写入仍由确定性产品流程完成。</p>
+
+      <dl class="case-summary" aria-label="MVP 核心信息">
+        <div>
+          <dt>体验闭环</dt>
+          <dd>首页待机 → 一起散步 → 小花事件 → 共同回忆与收藏</dd>
+        </div>
+        <div>
+          <dt>Agent 职责</dt>
+          <dd>读取结构化 Mock 情境，只决定现在介入或保持安静</dd>
+        </div>
+        <div>
+          <dt>设备范围</dt>
+          <dd>iPhone 提供完整基础体验，Apple Watch 提供增强体验</dd>
+        </div>
+      </dl>
+
+      <section class="route-panel" aria-labelledby="route-title">
+        <h2 id="route-title">选择一条完整体验路径</h2>
+        <p class="route-help">一次查看一个结果分支；切换选择不会打断共同的端到端主线。</p>
+        <div class="route-options" role="group" aria-label="用户路径">
+          <button class="route-button" type="button" data-route="bring" aria-pressed="true">带花回家</button>
+          <button class="route-button" type="button" data-route="photo" aria-pressed="false">拍张合影</button>
+          <button class="route-button" type="button" data-route="pat" aria-pressed="false">拍拍 zaizai</button>
+          <button class="route-button" type="button" data-route="wait" aria-pressed="false">等我一下 → 结束</button>
+          <button class="route-button" type="button" data-route="dismiss" aria-pressed="false">继续散步</button>
+          <button class="route-button" type="button" data-route="silent" aria-pressed="false">Agent 暂不介入</button>
+        </div>
+        <p class="route-current" id="route-current" aria-live="polite"></p>
+      </section>
+    </header>
+
+    <main class="flow" aria-label="zaizai Agentic MVP 纵向用户流程">
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">01</div>
+        <div class="step-body">
+          <p class="step-kicker">App 首页</p>
+          <h2>先看一眼 zaizai</h2>
+          <p class="step-lead">每次全新进入，zaizai 可能清醒，也可能正在睡觉；三个内容入口从一开始就存在。</p>
+          <div class="sequence">
+            <div class="sequence-item">
+              <strong>清醒 60%</strong>
+              <span>坐着看你、呼吸、眨眼、惬意摆尾，偶尔歪头。</span>
+            </div>
+            <div class="sequence-item">
+              <strong>睡眠 40%</strong>
+              <span>趴睡呼吸，偶尔出现蝴蝶、骨头或气球的像素梦境，也可能自然醒来。</span>
+            </div>
+            <div class="sequence-item">
+              <strong>轻互动</strong>
+              <span>点击清醒的 zaizai 出现爱心泡泡，回应后仍保持清醒；点击睡着的 zaizai 会唤醒它。</span>
+            </div>
+          </div>
+          <p class="inline-return"><strong>待机微循环：</strong>清醒 15 秒无操作 → 趴睡；爱心泡泡只是清醒状态的互动侧支，结束后回到清醒并重启 15 秒计时。每经过一个随机的 15–20 秒睡眠观察段，约有 35% 概率自然醒来，否则继续趴睡并进入下一个观察段。这个循环不调用 LLM。</p>
+          <p class="inline-return">用户也可以先打开“回忆”“小收藏”或“相册”；返回首页时恢复离开前的待机状态。</p>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">02</div>
+        <div class="step-body">
+          <p class="step-kicker">开始散步</p>
+          <h2>点击“一起散步”，再确认一次</h2>
+          <p class="step-lead">如果 zaizai 正在睡觉，它先柔和醒来并坐好约 0.5 秒。只有确认“开始散步”后，散步或 Workout 才真正开始。</p>
+          <div class="sequence">
+            <div class="sequence-item">
+              <strong>点击“一起散步”</strong>
+              <span>主入口比三个内容入口更突出。</span>
+            </div>
+            <div class="sequence-item">
+              <strong>开始确认</strong>
+              <span>主按钮“开始散步”，次按钮“再想想”。</span>
+            </div>
+            <div class="sequence-item">
+              <strong>进入散步</strong>
+              <span>iPhone 或 Watch 都可以发起。</span>
+            </div>
+          </div>
+          <p class="inline-return">选择“再想想” → 返回首页，zaizai 保持清醒，15 秒待机计时重新开始。</p>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">03</div>
+        <div class="step-body">
+          <p class="step-kicker">散步进行中 · Agent 幕后判断</p>
+          <h2>zaizai 正在走，Agent 只决定现在要不要打扰</h2>
+          <p class="step-lead">前台始终是穿着胸背、开心侧身行走的 zaizai；没有地点、季节或昼夜背景。页面显示 Mock 时长和“结束散步”。</p>
+
+          <div class="agent-outcome" id="agent-outcome">
+            <strong id="agent-title"></strong>
+            <span id="agent-copy"></span>
+          </div>
+
+          <details>
+            <summary>展开幕后 Agent 节奏与限制</summary>
+            <ol class="agent-rules">
+              <li data-order="1">散步前 2 分钟不提示；约第 2–3 分钟，小花进入可判断阶段。</li>
+              <li data-order="2">之后约每 45–60 秒出现一次内部检查机会，不持续调用 LLM。</li>
+              <li data-order="3">内部结果只有 <code>intervene_now</code> 或 <code>stay_silent</code>。</li>
+              <li data-order="4"><code>stay_silent</code> 不重置可见提示之间至少 3 分钟的间隔。</li>
+              <li data-order="5">每次散步最多 3 次可见主动提示；当前只有一个小花候选，所以实际最多提示一次。</li>
+            </ol>
+          </details>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">04</div>
+        <div class="step-body">
+          <p class="step-kicker">跨端提示</p>
+          <h2 id="prompt-heading"></h2>
+          <p class="step-lead" id="prompt-lead"></p>
+
+          <div id="visible-prompt">
+            <div class="device-row">
+              <div class="device">
+                <strong>iPhone</strong>
+                <span>散步页上方出现小花 Banner／浮层。</span>
+              </div>
+              <div class="device">
+                <strong>Apple Watch</strong>
+                <span>一次普通事件触觉，并显示高对比提示卡。</span>
+              </div>
+            </div>
+            <p class="inline-return">两端显示同一个事件。用户在任一端操作后，另一端同步结果或收起提示。</p>
+            <div class="selected-action">
+              <strong id="prompt-action"></strong>
+              <span id="prompt-action-copy"></span>
+            </div>
+          </div>
+
+          <div class="outcome-box" id="no-prompt" hidden>
+            <strong>用户什么也不会看到</strong>
+            <span>没有 Banner、触觉、空栏目或“错过了什么”的暗示；zaizai 继续正常行走。</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">05</div>
+        <div class="step-body">
+          <p class="step-kicker">当前路径的分支结果</p>
+          <h2 id="branch-heading"></h2>
+          <p class="step-lead" id="branch-lead"></p>
+          <ul class="outcome-list" id="branch-list"></ul>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">06</div>
+        <div class="step-body">
+          <p class="step-kicker">继续行走与结束</p>
+          <h2 id="continue-heading"></h2>
+          <p class="step-lead" id="continue-lead"></p>
+
+          <div class="closing-sequence" id="closing-sequence">
+            <div class="sequence-item">
+              <strong>专属结果</strong>
+              <span>约 3 秒</span>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="sequence-item">
+              <strong>“然后，你们继续散步了”</strong>
+              <span>侧身行走图约 1.5 秒</span>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="sequence-item">
+              <strong>散步进行中</strong>
+              <span>自动返回，不需要再点按钮</span>
+            </div>
+          </div>
+
+          <div class="end-confirmation">
+            <h3>用户点击“结束散步”</h3>
+            <p>再次确认：“结束散步” → 进入总结；“继续走走” → 返回当前散步状态。只有确认后才结束散步或 Workout。</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">07</div>
+        <div class="step-body">
+          <p class="step-kicker">散步总结</p>
+          <h2>只展示真正发生的结果</h2>
+          <p class="step-lead">所有总结都有相同的基础部分；没有发生的内容不会留下空槽位。</p>
+
+          <div class="summary-stack">
+            <div class="summary-base">
+              <strong>固定内容</strong>
+              <span>本次散步时长 · zaizai 开心满足 · 主操作“回到首页”</span>
+            </div>
+            <div class="summary-extra">
+              <strong id="summary-title"></strong>
+              <span id="summary-copy"></span>
+            </div>
+          </div>
+          <p class="watch-note" id="watch-note"></p>
+        </div>
+      </article>
+
+      <article class="flow-step">
+        <div class="step-number" aria-hidden="true">08</div>
+        <div class="step-body">
+          <p class="step-kicker">回到 App 首页</p>
+          <h2>zaizai 清醒愉快 2 分钟</h2>
+          <p class="step-lead">总结不直接把用户传送到收藏页面。用户先回到首页，再自行查看真正新增的内容。</p>
+
+          <div class="books" aria-label="三个内容入口的更新状态">
+            <div class="book" data-book="memory">
+              <strong>回忆</strong>
+              <span>进入后标题为“共同回忆”</span>
+            </div>
+            <div class="book" data-book="collection">
+              <strong>小收藏</strong>
+              <span>花朵书签会放在这里</span>
+            </div>
+            <div class="book" data-book="album">
+              <strong>相册</strong>
+              <span>与小花的合影会放在这里</span>
+            </div>
+          </div>
+
+          <div class="selected-action">
+            <strong id="home-title"></strong>
+            <span id="home-copy"></span>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <p class="living-note">这是当前可用基线，不是锁定稿。HTML 审阅、后续线框图或 Prototype 中发现的问题，都可以继续反馈到文字流程和体验设计文档。</p>
+  </div>
+
+  <script>
+    const routes = {
+      bring: {
+        label: "带花回家",
+        current: "当前路线：Agent 介入 → 去看看 → 带花回家 → 获得共同回忆与花朵书签。",
+        agentTitle: "Agent 判断：现在介入",
+        agentCopy: "一个内部检查机会满足条件，小花提示进入 iPhone 与 Watch。",
+        promptVisible: true,
+        promptHeading: "两端同时告诉用户：zaizai 发现了一朵小花",
+        promptLead: "提示提供“去看看”“等我一下”“继续散步”三个选择。",
+        promptAction: "本路径选择：去看看",
+        promptActionCopy: "任一端选择后，另一端同步进入小花现场。",
+        branchHeading: "闻花现场 → 把它带回家",
+        branchLead: "用户先看到闻花主画面和“我们遇见的小花”，再作出现场选择。画面保留场景插画的原始色彩，不使用“正常人类色觉”的说法。",
+        branchItems: [
+          "显示：你把这朵和 zaizai 一起发现的小花带回了家。",
+          "“散步中的小花”写入共同回忆。",
+          "书签暂不在现场生成；散步结束时自动制作。"
+        ],
+        closing: true,
+        continueHeading: "短结果结束后，自动回到散步",
+        continueLead: "本次小花事件已经完成，不再出现提示或待处理 Banner。",
+        summaryTitle: "花朵书签进入小收藏",
+        summaryCopy: "展示书签美术与收纳动效，并提示“回到首页后，可以去小收藏看看”。没有直接跳转按钮。",
+        watchNote: "Watch 同样提示已经获得花朵书签；完整查看放到 iPhone App。",
+        updatedBooks: ["memory", "collection"],
+        homeTitle: "回忆与小收藏出现柔和高光",
+        homeCopy: "共同回忆包含闻花主图，以及“同一朵小花”下的“我们遇见的小花”和低机位“zaizai 眼里的小花”；页面说明每双眼睛看见的颜色都可能不同。小收藏新增花朵书签。"
+      },
+      photo: {
+        label: "拍张合影",
+        current: "当前路线：Agent 介入 → 去看看 → 拍张合影 → 获得共同回忆与相册照片。",
+        agentTitle: "Agent 判断：现在介入",
+        agentCopy: "一个内部检查机会满足条件，小花提示进入 iPhone 与 Watch。",
+        promptVisible: true,
+        promptHeading: "两端同时告诉用户：zaizai 发现了一朵小花",
+        promptLead: "提示提供“去看看”“等我一下”“继续散步”三个选择。",
+        promptAction: "本路径选择：去看看",
+        promptActionCopy: "任一端选择后，另一端同步进入小花现场。",
+        branchHeading: "闻花现场 → 拍张合影",
+        branchLead: "用户先看到闻花主画面和小花特写，再为 zaizai 与小花留下照片。",
+        branchItems: [
+          "展示带有拍立得或实体相纸边缘的预制合影。",
+          "合影写入相册。",
+          "“散步中的小花”同时写入共同回忆。"
+        ],
+        closing: true,
+        continueHeading: "短结果结束后，自动回到散步",
+        continueLead: "本次小花事件已经完成，不再出现提示或待处理 Banner。",
+        summaryTitle: "新合影进入相册",
+        summaryCopy: "再次展示实体相纸感合影与收纳动效，并提示“回到首页后，可以去相册看看”。没有直接跳转按钮。",
+        watchNote: "Watch 同样提示新照片已经保存；完整查看放到 iPhone App。",
+        updatedBooks: ["memory", "album"],
+        homeTitle: "回忆与相册出现柔和高光",
+        homeCopy: "共同回忆新增“小花”事件，其中以“我们遇见的小花”和低机位“zaizai 眼里的小花”呈现双视角；相册新增一张带日期的 zaizai 与小花合影。"
+      },
+      pat: {
+        label: "拍拍 zaizai",
+        current: "当前路线：Agent 介入 → 去看看 → 拍拍 zaizai → 获得带专属尾声图的共同回忆。",
+        agentTitle: "Agent 判断：现在介入",
+        agentCopy: "一个内部检查机会满足条件，小花提示进入 iPhone 与 Watch。",
+        promptVisible: true,
+        promptHeading: "两端同时告诉用户：zaizai 发现了一朵小花",
+        promptLead: "提示提供“去看看”“等我一下”“继续散步”三个选择。",
+        promptAction: "本路径选择：去看看",
+        promptActionCopy: "任一端选择后，另一端同步进入小花现场。",
+        branchHeading: "闻花现场 → 拍拍 zaizai 的头",
+        branchLead: "这个选择不产生物品或照片，但拥有自己的关系反馈。",
+        branchItems: [
+          "一只手轻轻摸 zaizai 的头，zaizai 开心地用脑袋蹭蹭这只手。",
+          "“蹭蹭手”画面成为该分支在共同回忆里的专属最后一张图。",
+          "不生成书签或相册照片。"
+        ],
+        closing: true,
+        continueHeading: "短动效结束后，自动回到散步",
+        continueLead: "本次小花事件已经完成，不再出现提示或待处理 Banner。",
+        summaryTitle: "这段互动进入共同回忆",
+        summaryCopy: "总结说明这次经历已经留下，其中包含 zaizai 蹭蹭用户手的专属尾声；不强推跳转。",
+        watchNote: "Watch 显示同一结果的简化总结，当前散步闭环已经完成。",
+        updatedBooks: ["memory"],
+        homeTitle: "只有回忆出现柔和高光",
+        homeCopy: "共同回忆新增“小花”事件，其中以“我们遇见的小花”和低机位“zaizai 眼里的小花”呈现双视角，并以 zaizai 开心蹭蹭用户手的画面收尾。"
+      },
+      wait: {
+        label: "等我一下 → 结束",
+        current: "当前路线：Agent 介入 → 等我一下（或 1 分钟无回应）→ Banner 保留 → 散步结束时自动呈现。",
+        agentTitle: "Agent 判断：现在介入",
+        agentCopy: "一个内部检查机会满足条件，小花提示进入 iPhone 与 Watch。",
+        promptVisible: true,
+        promptHeading: "两端同时告诉用户：zaizai 发现了一朵小花",
+        promptLead: "用户此刻不进入现场，事件转为可以稍后处理的轻量状态。",
+        promptAction: "本路径选择：等我一下",
+        promptActionCopy: "如果 1 分钟没有回应，也进入相同状态；初次提示静默收起。",
+        branchHeading: "散步页保留“刚才的小花”Banner",
+        branchLead: "zaizai 继续正常行走，不蹲在花旁，也不再次催促。",
+        branchItems: [
+          "用户点击 Banner 可以重新打开三个选择。",
+          "再次选择“等我一下”或关闭选择层，Banner 继续保留。",
+          "本路径一直不处理 Banner，直到用户结束散步。"
+        ],
+        closing: false,
+        continueHeading: "带着待处理 Banner 进入结束确认",
+        continueLead: "选择“继续走走”会回到仍保留 Banner 的散步页；确认结束后直接进入自动呈现。",
+        summaryTitle: "自动呈现 zaizai 看到的小花",
+        summaryCopy: "显示“今天 zaizai 在路上发现了一朵小花”，不再询问是否查看。共同回忆只含闻花主图与低机位“zaizai 眼里的小花”，没有“我们遇见的小花”、书签或照片。",
+        watchNote: "两端都能看到事件结果；完整共同回忆仍在 iPhone App 查看。",
+        updatedBooks: ["memory"],
+        homeTitle: "只有回忆出现柔和高光",
+        homeCopy: "新增的是特殊版本“小花”回忆：只有闻花主图与低机位“zaizai 眼里的小花”，不留下空槽位。"
+      },
+      dismiss: {
+        label: "继续散步",
+        current: "当前路线：Agent 介入 → 用户选择继续散步 → 小花事件结束 → 普通散步总结。",
+        agentTitle: "Agent 判断：现在介入",
+        agentCopy: "一个内部检查机会满足条件，小花提示进入 iPhone 与 Watch。",
+        promptVisible: true,
+        promptHeading: "两端同时告诉用户：zaizai 发现了一朵小花",
+        promptLead: "用户可以自然退出，不承担拒绝 zaizai 的情绪压力。",
+        promptAction: "本路径选择：继续散步",
+        promptActionCopy: "从待处理状态向上滑走 Banner 也得到相同结果。",
+        branchHeading: "小花事件安静结束",
+        branchLead: "zaizai 不委屈、不再次提示，也不会形成负面偏好。",
+        branchItems: [
+          "页面立即恢复为正常行走的 zaizai。",
+          "不写入共同回忆、小收藏或相册。",
+          "以后其他散步仍可能出现小花事件。"
+        ],
+        closing: false,
+        continueHeading: "继续普通散步",
+        continueLead: "用户准备结束时仍会经过结束确认；本次不再有小花相关内容。",
+        summaryTitle: "没有条件内容",
+        summaryCopy: "只显示散步时长、zaizai 开心满足和“回到首页”，不暗示用户刚才拒绝或错过了什么。",
+        watchNote: "iPhone 与 Watch 都不再显示本次小花事件。",
+        updatedBooks: [],
+        homeTitle: "三个内容入口都没有新高光",
+        homeCopy: "用户只回到清醒愉快的 zaizai；没有新增回忆、收藏或照片。"
+      },
+      silent: {
+        label: "Agent 暂不介入",
+        current: "当前路线：所有内部判断都选择 stay_silent → 用户从未收到小花提示 → 普通散步总结。",
+        agentTitle: "Agent 判断：现在不介入",
+        agentCopy: "用户界面不变化；候选事件留到下一次稀疏检查机会。若直到散步结束仍不介入，小花不会出现。",
+        promptVisible: false,
+        promptHeading: "没有用户可见的小花提示",
+        promptLead: "Agent 的内部判断不会自动变成通知、空栏目或待处理事件。",
+        promptAction: "",
+        promptActionCopy: "",
+        branchHeading: "zaizai 继续正常行走",
+        branchLead: "内部可以在约 45–60 秒后的下一次机会再次判断，但用户始终只看到散步页面。",
+        branchItems: [
+          "没有 Watch 触觉或 iPhone Banner。",
+          "没有小花现场、待处理 Banner 或用户选择。",
+          "如果所有判断都不介入，候选事件随散步结束。"
+        ],
+        closing: false,
+        continueHeading: "用户按普通路径结束散步",
+        continueLead: "点击“结束散步”后仍需确认；确认后进入基础总结。",
+        summaryTitle: "没有条件内容",
+        summaryCopy: "只显示散步时长、zaizai 开心满足和“回到首页”，不出现“发现”“纪念物”或错过提示。",
+        watchNote: "两端始终只显示正常散步状态与基础总结。",
+        updatedBooks: [],
+        homeTitle: "三个内容入口都没有新高光",
+        homeCopy: "用户只回到清醒愉快的 zaizai；没有新增回忆、收藏或照片。"
+      }
+    };
+
+    const routeButtons = Array.from(document.querySelectorAll("[data-route]"));
+    const routeCurrent = document.getElementById("route-current");
+    const agentTitle = document.getElementById("agent-title");
+    const agentCopy = document.getElementById("agent-copy");
+    const promptHeading = document.getElementById("prompt-heading");
+    const promptLead = document.getElementById("prompt-lead");
+    const visiblePrompt = document.getElementById("visible-prompt");
+    const noPrompt = document.getElementById("no-prompt");
+    const promptAction = document.getElementById("prompt-action");
+    const promptActionCopy = document.getElementById("prompt-action-copy");
+    const branchHeading = document.getElementById("branch-heading");
+    const branchLead = document.getElementById("branch-lead");
+    const branchList = document.getElementById("branch-list");
+    const closingSequence = document.getElementById("closing-sequence");
+    const continueHeading = document.getElementById("continue-heading");
+    const continueLead = document.getElementById("continue-lead");
+    const summaryTitle = document.getElementById("summary-title");
+    const summaryCopy = document.getElementById("summary-copy");
+    const watchNote = document.getElementById("watch-note");
+    const homeTitle = document.getElementById("home-title");
+    const homeCopy = document.getElementById("home-copy");
+    const bookNodes = Array.from(document.querySelectorAll("[data-book]"));
+
+    function setRoute(routeName) {
+      const route = routes[routeName];
+      if (!route) return;
+
+      routeButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.route === routeName));
+      });
+
+      routeCurrent.textContent = route.current;
+      agentTitle.textContent = route.agentTitle;
+      agentCopy.textContent = route.agentCopy;
+      promptHeading.textContent = route.promptHeading;
+      promptLead.textContent = route.promptLead;
+      visiblePrompt.hidden = !route.promptVisible;
+      noPrompt.hidden = route.promptVisible;
+      promptAction.textContent = route.promptAction;
+      promptActionCopy.textContent = route.promptActionCopy;
+      branchHeading.textContent = route.branchHeading;
+      branchLead.textContent = route.branchLead;
+      branchList.replaceChildren(...route.branchItems.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+      closingSequence.hidden = !route.closing;
+      continueHeading.textContent = route.continueHeading;
+      continueLead.textContent = route.continueLead;
+      summaryTitle.textContent = route.summaryTitle;
+      summaryCopy.textContent = route.summaryCopy;
+      watchNote.textContent = route.watchNote;
+      homeTitle.textContent = route.homeTitle;
+      homeCopy.textContent = route.homeCopy;
+
+      bookNodes.forEach((book) => {
+        const updated = route.updatedBooks.includes(book.dataset.book);
+        book.classList.toggle("is-updated", updated);
+        book.querySelector("span").textContent = updated
+          ? "本路径有新增内容"
+          : book.dataset.book === "memory"
+            ? "进入后标题为“共同回忆”"
+            : book.dataset.book === "collection"
+              ? "花朵书签会放在这里"
+              : "与小花的合影会放在这里";
+      });
+    }
+
+    routeButtons.forEach((button) => {
+      button.addEventListener("click", () => setRoute(button.dataset.route));
+    });
+
+    setRoute("bring");
+  </script>
+</body>
+</html>
